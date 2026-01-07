@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -22,5 +23,16 @@ class Team extends Model
     public function region(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Region::class);
+    }
+
+    /**
+     * Get all games where this team participated.
+     *
+     * @return Builder<Game>
+     */
+    public function games(): Builder
+    {
+        return Game::where('team1_id', $this->id)
+            ->orWhere('team2_id', $this->id);
     }
 }

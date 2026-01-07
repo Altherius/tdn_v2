@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\TeamController;
 use App\Models\Team;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -13,6 +14,8 @@ Route::get('/', function () {
             ->get(),
     ]);
 })->name('home');
+
+Route::get('teams/{team}', [TeamController::class, 'show'])->name('teams.show');
 
 Route::get('dashboard', function () {
     return Inertia::render('Dashboard');

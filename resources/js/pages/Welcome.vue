@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { show as showTeam } from '@/actions/App/Http/Controllers/TeamController';
 import { useAppearance } from '@/composables/useAppearance';
 import { dashboard, login, register } from '@/routes';
 import { Head, Link } from '@inertiajs/vue3';
@@ -93,7 +94,14 @@ function toggleTheme() {
                             :key="team.id"
                             class="border-b border-[#e3e3e0] last:border-b-0 dark:border-[#3E3E3A]"
                         >
-                            <td class="px-6 py-4 text-sm font-medium">{{ team.name }}</td>
+                            <td class="px-6 py-4 text-sm font-medium">
+                                <Link
+                                    :href="showTeam(team.id).url"
+                                    class="hover:underline"
+                                >
+                                    {{ team.name }}
+                                </Link>
+                            </td>
                             <td class="px-6 py-4 text-sm text-[#706f6c] dark:text-[#A1A09A]">{{ team.region.name }}</td>
                             <td class="px-6 py-4 text-right text-sm font-mono">{{ team.elo_rating }}</td>
                         </tr>
