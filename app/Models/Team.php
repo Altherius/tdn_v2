@@ -35,4 +35,12 @@ class Team extends Model
         return Game::where('team1_id', $this->id)
             ->orWhere('team2_id', $this->id);
     }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\EloHistory, $this>
+     */
+    public function eloHistory(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(EloHistory::class);
+    }
 }

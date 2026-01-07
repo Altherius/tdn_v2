@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\Team;
+use App\Models\Tournament;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -24,6 +25,13 @@ class GameFactory extends Factory
             'leg1_team2_score' => null,
             'leg2_team1_score' => null,
             'leg2_team2_score' => null,
+            'tournament_id' => function () {
+                if ($this->faker->boolean(90)) {
+                    return Tournament::inRandomOrder()->first()?->id;
+                }
+
+                return null;
+            },
         ];
     }
 
@@ -34,6 +42,13 @@ class GameFactory extends Factory
             'leg1_team2_score' => fake()->numberBetween(0, 5),
             'leg2_team1_score' => fake()->numberBetween(0, 5),
             'leg2_team2_score' => fake()->numberBetween(0, 5),
+        ]);
+    }
+
+    public function withoutTournament(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'tournament_id' => null,
         ]);
     }
 }

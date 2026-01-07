@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\TeamController;
+use App\Http\Controllers\TournamentController;
 use App\Models\Team;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -15,6 +16,13 @@ Route::get('/', function () {
     ]);
 })->name('home');
 
+Route::get('tournaments', [TournamentController::class, 'index'])->name('tournaments.index');
+Route::get('tournaments/{tournament}', [TournamentController::class, 'show'])->name('tournaments.show');
+
+Route::get('teams/new', [TeamController::class, 'create'])->name('teams.create');
+Route::post('teams', [TeamController::class, 'store'])->name('teams.store');
+Route::get('teams/edit/{team}', [TeamController::class, 'edit'])->name('teams.edit');
+Route::put('teams/{team}', [TeamController::class, 'update'])->name('teams.update');
 Route::get('teams/{team}', [TeamController::class, 'show'])->name('teams.show');
 
 Route::get('dashboard', function () {

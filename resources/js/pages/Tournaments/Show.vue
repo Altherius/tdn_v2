@@ -1,40 +1,21 @@
 <script setup lang="ts">
-import { edit as editTeam, show as showTeam } from '@/actions/App/Http/Controllers/TeamController';
-import { show as showTournament } from '@/actions/App/Http/Controllers/TournamentController';
+import { index as indexTournaments } from '@/actions/App/Http/Controllers/TournamentController';
+import { show as showTeam } from '@/actions/App/Http/Controllers/TeamController';
 import { useAppearance } from '@/composables/useAppearance';
-import { home } from '@/routes';
 import { Head, Link } from '@inertiajs/vue3';
-import {
-    CategoryScale,
-    Chart as ChartJS,
-    Legend,
-    LinearScale,
-    LineElement,
-    PointElement,
-    Title,
-    Tooltip,
-} from 'chart.js';
 import { Moon, Sun } from 'lucide-vue-next';
-import { computed } from 'vue';
-import { Line } from 'vue-chartjs';
-
-ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
-
-interface Region {
-    id: number;
-    name: string;
-}
 
 interface Team {
     id: number;
     name: string;
-    elo_rating: number;
-    region: Region;
 }
 
 interface Tournament {
     id: number;
     name: string;
+    winner: Team | null;
+    secondPlace: Team | null;
+    thirdPlace: Team | null;
 }
 
 interface Game {
@@ -47,21 +28,11 @@ interface Game {
     leg1_team2_score: number | null;
     leg2_team1_score: number | null;
     leg2_team2_score: number | null;
-    tournament: Tournament | null;
 }
 
-interface EloHistory {
-    id: number;
-    team_id: number;
-    game_id: number;
-    rating: number;
-    created_at: string;
-}
-
-const props = defineProps<{
-    team: Team;
+defineProps<{
+    tournament: Tournament;
     games: Game[];
-    eloHistory: EloHistory[];
 }>();
 
 const { resolvedAppearance, updateAppearance } = useAppearance();
@@ -110,89 +81,18 @@ function getTieResultClass(game: Game): string {
     const team1Total = game.leg1_team1_score + game.leg2_team1_score;
     const team2Total = game.leg1_team2_score + game.leg2_team2_score;
 
-    const isTeam1 = props.team.id === game.team1_id;
-    const teamTotal = isTeam1 ? team1Total : team2Total;
-    const opponentTotal = isTeam1 ? team2Total : team1Total;
-
-    if (teamTotal > opponentTotal) {
+    if (team1Total > team2Total) {
         return 'text-green-600 dark:text-green-400';
-    } else if (teamTotal < opponentTotal) {
+    } else if (team1Total < team2Total) {
         return 'text-red-600 dark:text-red-400';
     }
 
     return 'text-yellow-600 dark:text-yellow-400';
 }
-
-const chartData = computed(() => {
-    const labels = ['Start', ...props.eloHistory.map((_, index) => `Game ${index + 1}`)];
-    const ratings = [1000, ...props.eloHistory.map((h) => h.rating)];
-
-    const isDark = resolvedAppearance.value === 'dark';
-    const lineColor = isDark ? '#60a5fa' : '#2563eb';
-    const pointColor = isDark ? '#93c5fd' : '#1d4ed8';
-
-    return {
-        labels,
-        datasets: [
-            {
-                label: 'Elo Rating',
-                data: ratings,
-                borderColor: lineColor,
-                backgroundColor: pointColor,
-                tension: 0.1,
-                pointRadius: 4,
-                pointHoverRadius: 6,
-            },
-        ],
-    };
-});
-
-const chartOptions = computed(() => {
-    const isDark = resolvedAppearance.value === 'dark';
-    const textColor = isDark ? '#A1A09A' : '#706f6c';
-    const gridColor = isDark ? '#3E3E3A' : '#e3e3e0';
-
-    return {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-            legend: {
-                display: false,
-            },
-            title: {
-                display: true,
-                text: 'Elo Rating History',
-                color: textColor,
-                font: {
-                    size: 16,
-                    weight: 'bold' as const,
-                },
-            },
-        },
-        scales: {
-            x: {
-                ticks: {
-                    color: textColor,
-                },
-                grid: {
-                    color: gridColor,
-                },
-            },
-            y: {
-                ticks: {
-                    color: textColor,
-                },
-                grid: {
-                    color: gridColor,
-                },
-            },
-        },
-    };
-});
 </script>
 
 <template>
-    <Head :title="team.name" />
+    <Head :title="tournament.name" />
     <div class="flex min-h-screen flex-col bg-[#FDFDFC] text-[#1b1b18] dark:bg-[#0a0a0a] dark:text-[#EDEDEC]">
         <header class="w-full border-b border-[#e3e3e0] bg-white px-6 py-4 dark:border-[#3E3E3A] dark:bg-[#161615]">
             <nav class="mx-auto flex max-w-4xl items-center justify-between">
@@ -206,34 +106,53 @@ const chartOptions = computed(() => {
                         <Moon v-else class="h-5 w-5" />
                     </button>
                     <Link
-                        :href="home()"
+                        :href="indexTournaments().url"
                         class="text-sm text-[#706f6c] hover:text-[#1b1b18] dark:text-[#A1A09A] dark:hover:text-[#EDEDEC]"
                     >
-                        &larr; Back to rankings
+                        &larr; Back to tournaments
                     </Link>
                 </div>
             </nav>
         </header>
 
         <main class="mx-auto w-full max-w-4xl p-6 lg:p-8">
-            <div class="mb-6">
-                <h1 class="text-2xl font-bold">{{ team.name }}</h1>
-                <p class="text-[#706f6c] dark:text-[#A1A09A]">
-                    {{ team.region.name }} &middot; Rating: {{ team.elo_rating }}
-                </p>
-                <Link
-                    :href="editTeam(team.id).url"
-                    class="mt-2 inline-block text-sm text-[#706f6c] hover:text-[#1b1b18] dark:text-[#A1A09A] dark:hover:text-[#EDEDEC]"
-                >
-                    Edit team
-                </Link>
-            </div>
+            <h1 class="mb-6 text-2xl font-bold">{{ tournament.name }}</h1>
 
-            <div
-                class="mb-8 overflow-hidden rounded-lg border border-[#e3e3e0] bg-white p-6 shadow-sm dark:border-[#3E3E3A] dark:bg-[#161615]"
-            >
-                <div class="h-64">
-                    <Line :data="chartData" :options="chartOptions" />
+            <div class="mb-8 grid gap-4 md:grid-cols-3">
+                <div class="rounded-lg border border-[#e3e3e0] bg-white p-6 shadow-sm dark:border-[#3E3E3A] dark:bg-[#161615]">
+                    <p class="mb-2 text-sm font-medium text-[#706f6c] dark:text-[#A1A09A]">Winner</p>
+                    <Link
+                        v-if="tournament.winner"
+                        :href="showTeam(tournament.winner.id).url"
+                        class="text-lg font-semibold hover:underline"
+                    >
+                        {{ tournament.winner.name }}
+                    </Link>
+                    <p v-else class="text-lg text-[#706f6c] dark:text-[#A1A09A]">-</p>
+                </div>
+
+                <div class="rounded-lg border border-[#e3e3e0] bg-white p-6 shadow-sm dark:border-[#3E3E3A] dark:bg-[#161615]">
+                    <p class="mb-2 text-sm font-medium text-[#706f6c] dark:text-[#A1A09A]">2nd Place</p>
+                    <Link
+                        v-if="tournament.secondPlace"
+                        :href="showTeam(tournament.secondPlace.id).url"
+                        class="text-lg font-semibold hover:underline"
+                    >
+                        {{ tournament.secondPlace.name }}
+                    </Link>
+                    <p v-else class="text-lg text-[#706f6c] dark:text-[#A1A09A]">-</p>
+                </div>
+
+                <div class="rounded-lg border border-[#e3e3e0] bg-white p-6 shadow-sm dark:border-[#3E3E3A] dark:bg-[#161615]">
+                    <p class="mb-2 text-sm font-medium text-[#706f6c] dark:text-[#A1A09A]">3rd Place</p>
+                    <Link
+                        v-if="tournament.thirdPlace"
+                        :href="showTeam(tournament.thirdPlace.id).url"
+                        class="text-lg font-semibold hover:underline"
+                    >
+                        {{ tournament.thirdPlace.name }}
+                    </Link>
+                    <p v-else class="text-lg text-[#706f6c] dark:text-[#A1A09A]">-</p>
                 </div>
             </div>
 
@@ -244,7 +163,6 @@ const chartOptions = computed(() => {
                     <thead>
                         <tr class="border-b border-[#e3e3e0] bg-[#f8f8f7] dark:border-[#3E3E3A] dark:bg-[#1a1a19]">
                             <th class="px-6 py-3 text-left text-sm font-semibold">Teams</th>
-                            <th class="px-6 py-3 text-left text-sm font-semibold">Tournament</th>
                             <th class="px-6 py-3 text-center text-sm font-semibold">Leg 1</th>
                             <th class="px-6 py-3 text-center text-sm font-semibold">Leg 2</th>
                             <th class="px-6 py-3 text-center text-sm font-semibold">Tie</th>
@@ -252,8 +170,8 @@ const chartOptions = computed(() => {
                     </thead>
                     <tbody>
                         <tr v-if="games.length === 0">
-                            <td colspan="5" class="px-6 py-8 text-center text-[#706f6c] dark:text-[#A1A09A]">
-                                No games played yet.
+                            <td colspan="4" class="px-6 py-8 text-center text-[#706f6c] dark:text-[#A1A09A]">
+                                No games in this tournament yet.
                             </td>
                         </tr>
                         <tr
@@ -262,37 +180,19 @@ const chartOptions = computed(() => {
                             class="border-b border-[#e3e3e0] last:border-b-0 dark:border-[#3E3E3A]"
                         >
                             <td class="px-6 py-4 text-sm">
-                                <span v-if="team.id === game.team1_id" class="font-semibold">
-                                    {{ game.team1.name }}
-                                </span>
                                 <Link
-                                    v-else
                                     :href="showTeam(game.team1.id).url"
                                     class="hover:underline"
                                 >
                                     {{ game.team1.name }}
                                 </Link>
                                 <span class="mx-2 text-[#706f6c] dark:text-[#A1A09A]">vs</span>
-                                <span v-if="team.id === game.team2_id" class="font-semibold">
-                                    {{ game.team2.name }}
-                                </span>
                                 <Link
-                                    v-else
                                     :href="showTeam(game.team2.id).url"
                                     class="hover:underline"
                                 >
                                     {{ game.team2.name }}
                                 </Link>
-                            </td>
-                            <td class="px-6 py-4 text-sm text-[#706f6c] dark:text-[#A1A09A]">
-                                <Link
-                                    v-if="game.tournament"
-                                    :href="showTournament(game.tournament.id).url"
-                                    class="hover:underline"
-                                >
-                                    {{ game.tournament.name }}
-                                </Link>
-                                <span v-else>Friendly</span>
                             </td>
                             <td class="px-6 py-4 text-center text-sm font-mono">
                                 {{ formatLegResult(game, 1) }}

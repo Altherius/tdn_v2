@@ -4,6 +4,7 @@ namespace App\Listeners;
 
 use App\Enums\GameResult;
 use App\Events\GameCreated;
+use App\Models\EloHistory;
 use App\Services\EloRatingService;
 
 class UpdateTeamRatings
@@ -47,7 +48,22 @@ class UpdateTeamRatings
             $team2Result
         );
 
-        $team1->update(['elo_rating' => $team1->elo_rating + $team1Points]);
-        $team2->update(['elo_rating' => $team2->elo_rating + $team2Points]);
+        $team1NewRating = $team1->elo_rating + $team1Points;
+        $team2NewRating = $team2->elo_rating + $team2Points;
+
+        $team1->update(['elo_rating' => $team1NewRating]);
+        $team2->update(['elo_rating' => $team2NewRating]);
+
+        EloHistory::create([
+            'team_id' => $team1->id,
+            'game_id' => $game->id,
+            'rating' => $team1NewRating,
+        ]);
+
+        EloHistory::create([
+            'team_id' => $team2->id,
+            'game_id' => $game->id,
+            'rating' => $team2NewRating,
+        ]);
     }
 }

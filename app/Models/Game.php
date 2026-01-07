@@ -18,6 +18,7 @@ class Game extends Model
         'leg1_team2_score',
         'leg2_team1_score',
         'leg2_team2_score',
+        'tournament_id',
     ];
 
     protected static function booted(): void
@@ -89,5 +90,13 @@ class Game extends Model
         }
 
         return null;
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\Tournament, $this>
+     */
+    public function tournament(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(Tournament::class);
     }
 }
