@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Events\GameCreated;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -18,6 +19,23 @@ class Game extends Model
         'leg2_team1_score',
         'leg2_team2_score',
     ];
+
+    protected static function booted(): void
+    {
+        static::created(function (Game $game) {
+            if ($game->isComplete()) {
+                GameCreated::dispatch($game);
+            }
+        });
+    }
+
+    public function isComplete(): bool
+    {
+        return $this->leg1_team1_score !== null
+            && $this->leg1_team2_score !== null
+            && $this->leg2_team1_score !== null
+            && $this->leg2_team2_score !== null;
+    }
 
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\Team, $this>
