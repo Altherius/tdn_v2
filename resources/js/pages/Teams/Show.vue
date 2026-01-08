@@ -124,7 +124,7 @@ function getTieResultClass(game: Game): string {
 }
 
 const chartData = computed(() => {
-    const labels = ['Start', ...props.eloHistory.map((_, index) => `Game ${index + 1}`)];
+    const labels = ['Initial', ...props.eloHistory.map((_, index) => `Match ${index + 1}`)];
     const ratings = [1000, ...props.eloHistory.map((h) => h.rating)];
 
     const isDark = resolvedAppearance.value === 'dark';
@@ -135,7 +135,7 @@ const chartData = computed(() => {
         labels,
         datasets: [
             {
-                label: 'Elo Rating',
+                label: 'Classement',
                 data: ratings,
                 borderColor: lineColor,
                 backgroundColor: pointColor,
@@ -161,7 +161,7 @@ const chartOptions = computed(() => {
             },
             title: {
                 display: true,
-                text: 'Elo Rating History',
+                text: 'Historique du classement',
                 color: textColor,
                 font: {
                     size: 16,
@@ -209,7 +209,7 @@ const chartOptions = computed(() => {
                         :href="home()"
                         class="text-sm text-[#706f6c] hover:text-[#1b1b18] dark:text-[#A1A09A] dark:hover:text-[#EDEDEC]"
                     >
-                        &larr; Back to rankings
+                        &larr; Retour au classement
                     </Link>
                 </div>
             </nav>
@@ -219,13 +219,13 @@ const chartOptions = computed(() => {
             <div class="mb-6">
                 <h1 class="text-2xl font-bold">{{ team.name }}</h1>
                 <p class="text-[#706f6c] dark:text-[#A1A09A]">
-                    {{ team.region.name }} &middot; Rating: {{ team.elo_rating }}
+                    {{ team.region.name }} &middot; Classement : {{ team.elo_rating }}
                 </p>
                 <Link
                     :href="editTeam(team.id).url"
                     class="mt-2 inline-block text-sm text-[#706f6c] hover:text-[#1b1b18] dark:text-[#A1A09A] dark:hover:text-[#EDEDEC]"
                 >
-                    Edit team
+                    Éditer l'équipe
                 </Link>
             </div>
 
@@ -237,23 +237,23 @@ const chartOptions = computed(() => {
                 </div>
             </div>
 
-            <h2 class="mb-4 text-lg font-semibold">Games</h2>
+            <h2 class="mb-4 text-lg font-semibold">Historique des matchs</h2>
 
             <div class="overflow-hidden rounded-lg border border-[#e3e3e0] bg-white shadow-sm dark:border-[#3E3E3A] dark:bg-[#161615]">
                 <table class="w-full">
                     <thead>
                         <tr class="border-b border-[#e3e3e0] bg-[#f8f8f7] dark:border-[#3E3E3A] dark:bg-[#1a1a19]">
-                            <th class="px-6 py-3 text-left text-sm font-semibold">Teams</th>
-                            <th class="px-6 py-3 text-left text-sm font-semibold">Tournament</th>
-                            <th class="px-6 py-3 text-center text-sm font-semibold">Leg 1</th>
-                            <th class="px-6 py-3 text-center text-sm font-semibold">Leg 2</th>
-                            <th class="px-6 py-3 text-center text-sm font-semibold">Tie</th>
+                            <th class="px-6 py-3 text-left text-sm font-semibold">Équipes</th>
+                            <th class="px-6 py-3 text-left text-sm font-semibold">Tournoi</th>
+                            <th class="px-6 py-3 text-center text-sm font-semibold">Aller</th>
+                            <th class="px-6 py-3 text-center text-sm font-semibold">Retour</th>
+                            <th class="px-6 py-3 text-center text-sm font-semibold">Total</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr v-if="games.length === 0">
                             <td colspan="5" class="px-6 py-8 text-center text-[#706f6c] dark:text-[#A1A09A]">
-                                No games played yet.
+                                Aucun match joué.
                             </td>
                         </tr>
                         <tr
@@ -292,7 +292,7 @@ const chartOptions = computed(() => {
                                 >
                                     {{ game.tournament.name }}
                                 </Link>
-                                <span v-else>Friendly</span>
+                                <span class="dark:text-[#444444]" v-else><i>Amical</i></span>
                             </td>
                             <td class="px-6 py-4 text-center text-sm font-mono">
                                 {{ formatLegResult(game, 1) }}

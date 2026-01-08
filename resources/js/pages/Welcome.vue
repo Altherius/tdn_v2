@@ -113,19 +113,19 @@ const filteredAndSortedTeams = computed(() => {
                         :href="indexTournaments().url"
                         class="text-sm text-[#706f6c] hover:text-[#1b1b18] dark:text-[#A1A09A] dark:hover:text-[#EDEDEC]"
                     >
-                        Tournaments
+                        Tournois
                     </Link>
                     <Link
                         :href="createTeam().url"
                         class="text-sm text-[#706f6c] hover:text-[#1b1b18] dark:text-[#A1A09A] dark:hover:text-[#EDEDEC]"
                     >
-                        + Create Team
+                        Créer une équipe
                     </Link>
                     <Link
                         :href="createGame().url"
                         class="text-sm text-[#706f6c] hover:text-[#1b1b18] dark:text-[#A1A09A] dark:hover:text-[#EDEDEC]"
                     >
-                        + Create Game
+                        Créer un match
                     </Link>
                 </div>
 
@@ -142,14 +142,7 @@ const filteredAndSortedTeams = computed(() => {
                             :href="login()"
                             class="inline-block rounded-sm border border-transparent px-5 py-1.5 text-sm leading-normal text-[#1b1b18] hover:border-[#19140035] dark:text-[#EDEDEC] dark:hover:border-[#3E3E3A]"
                         >
-                            Log in
-                        </Link>
-                        <Link
-                            v-if="canRegister"
-                            :href="register()"
-                            class="inline-block rounded-sm border border-[#19140035] px-5 py-1.5 text-sm leading-normal text-[#1b1b18] hover:border-[#1915014a] dark:border-[#3E3E3A] dark:text-[#EDEDEC] dark:hover:border-[#62605b]"
-                        >
-                            Register
+                            Se connecter
                         </Link>
                     </template>
                 </div>
@@ -157,14 +150,14 @@ const filteredAndSortedTeams = computed(() => {
         </header>
 
         <main class="mx-auto w-full max-w-4xl p-6 lg:p-8">
-            <h1 class="mb-6 text-2xl font-bold">Teams Ranking</h1>
+            <h1 class="mb-6 text-2xl font-bold">Classement des équipes</h1>
 
             <!-- Search input -->
             <div class="mb-4">
                 <input
                     v-model="searchQuery"
                     type="text"
-                    placeholder="Filter by team or region name..."
+                    placeholder="Filtrer par équipe ou par région..."
                     class="w-full rounded-lg border border-[#e3e3e0] bg-white px-4 py-2 text-sm outline-none placeholder:text-[#706f6c] focus:border-[#1b1b18] focus:ring-1 focus:ring-[#1b1b18] dark:border-[#3E3E3A] dark:bg-[#161615] dark:placeholder:text-[#A1A09A] dark:focus:border-[#EDEDEC] dark:focus:ring-[#EDEDEC]"
                 />
             </div>
@@ -178,7 +171,7 @@ const filteredAndSortedTeams = computed(() => {
                                     @click="toggleSort('name')"
                                     class="inline-flex items-center gap-1 hover:text-[#1b1b18] dark:hover:text-[#EDEDEC]"
                                 >
-                                    Team
+                                    Équipe
                                     <ArrowUp v-if="sortColumn === 'name' && sortDirection === 'asc'" class="h-4 w-4" />
                                     <ArrowDown v-else-if="sortColumn === 'name' && sortDirection === 'desc'" class="h-4 w-4" />
                                     <ArrowUpDown v-else class="h-4 w-4 text-[#706f6c] dark:text-[#A1A09A]" />
@@ -189,7 +182,7 @@ const filteredAndSortedTeams = computed(() => {
                                     @click="toggleSort('region')"
                                     class="inline-flex items-center gap-1 hover:text-[#1b1b18] dark:hover:text-[#EDEDEC]"
                                 >
-                                    Region
+                                    Région
                                     <ArrowUp v-if="sortColumn === 'region' && sortDirection === 'asc'" class="h-4 w-4" />
                                     <ArrowDown v-else-if="sortColumn === 'region' && sortDirection === 'desc'" class="h-4 w-4" />
                                     <ArrowUpDown v-else class="h-4 w-4 text-[#706f6c] dark:text-[#A1A09A]" />
@@ -200,19 +193,19 @@ const filteredAndSortedTeams = computed(() => {
                                     @click="toggleSort('elo_rating')"
                                     class="inline-flex items-center gap-1 hover:text-[#1b1b18] dark:hover:text-[#EDEDEC]"
                                 >
-                                    Rating
+                                    Classement
                                     <ArrowUp v-if="sortColumn === 'elo_rating' && sortDirection === 'asc'" class="h-4 w-4" />
                                     <ArrowDown v-else-if="sortColumn === 'elo_rating' && sortDirection === 'desc'" class="h-4 w-4" />
                                     <ArrowUpDown v-else class="h-4 w-4 text-[#706f6c] dark:text-[#A1A09A]" />
                                 </button>
                             </th>
-                            <th class="px-6 py-3 text-left text-sm font-semibold">Last games</th>
+                            <th class="px-6 py-3 text-right text-sm font-semibold">Derniers matchs</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr v-if="filteredAndSortedTeams.length === 0">
                             <td colspan="4" class="px-6 py-8 text-center text-[#706f6c] dark:text-[#A1A09A]">
-                                No teams found.
+                                Aucune équipe trouvée.
                             </td>
                         </tr>
                         <tr
@@ -231,7 +224,7 @@ const filteredAndSortedTeams = computed(() => {
                             <td class="px-6 py-4 text-sm text-[#706f6c] dark:text-[#A1A09A]">{{ team.region.name }}</td>
                             <td class="px-6 py-4 text-right text-sm font-mono">{{ team.elo_rating }}</td>
                             <td class="px-6 py-4">
-                                <div class="flex gap-1">
+                                <div class="flex gap-1 justify-end">
                                     <span
                                         v-for="(result, index) in [...team.lastGames].reverse()"
                                         :key="index"

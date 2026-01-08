@@ -48,7 +48,7 @@ function toggleTheme() {
                         :href="home()"
                         class="text-sm text-[#706f6c] hover:text-[#1b1b18] dark:text-[#A1A09A] dark:hover:text-[#EDEDEC]"
                     >
-                        &larr; Back to rankings
+                        &larr; Retour au classement
                     </Link>
                 </div>
             </nav>
@@ -56,19 +56,19 @@ function toggleTheme() {
 
         <main class="mx-auto w-full max-w-4xl p-6 lg:p-8">
             <div class="mb-6">
-                <h1 class="text-2xl font-bold">Tournaments</h1>
+                <h1 class="text-2xl font-bold">Tournois</h1>
                 <div class="flex gap-4">
                     <Link
                         :href="createTournament().url"
                         class="mt-2 inline-block text-sm text-[#706f6c] hover:text-[#1b1b18] dark:text-[#A1A09A] dark:hover:text-[#EDEDEC]"
                     >
-                        + Create tournament
+                        Créer un tournoi
                     </Link>
                     <Link
                         :href="generateRoster().url"
                         class="mt-2 inline-block text-sm text-[#706f6c] hover:text-[#1b1b18] dark:text-[#A1A09A] dark:hover:text-[#EDEDEC]"
                     >
-                        Generate roster
+                        Générer un roster de tournoi
                     </Link>
                 </div>
             </div>
@@ -77,10 +77,10 @@ function toggleTheme() {
                 <table class="w-full">
                     <thead>
                         <tr class="border-b border-[#e3e3e0] bg-[#f8f8f7] dark:border-[#3E3E3A] dark:bg-[#1a1a19]">
-                            <th class="px-6 py-3 text-left text-sm font-semibold">Name</th>
-                            <th class="px-6 py-3 text-left text-sm font-semibold">Winner</th>
-                            <th class="px-6 py-3 text-left text-sm font-semibold">2nd Place</th>
-                            <th class="px-6 py-3 text-left text-sm font-semibold">3rd Place</th>
+                            <th class="px-6 py-3 text-left text-sm font-semibold">Nom</th>
+                            <th class="px-6 py-3 text-left text-sm font-semibold">Vainqueur</th>
+                            <th class="px-6 py-3 text-left text-sm font-semibold">Deuxième</th>
+                            <th class="px-6 py-3 text-left text-sm font-semibold">Troisième</th>
                         </tr>
                     </thead>
                     <tbody>

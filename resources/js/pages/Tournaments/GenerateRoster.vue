@@ -90,14 +90,14 @@ const probabilities = computed(() =>
 
 const validationError = computed(() => {
     if (qualifiedTeams.value.length > slots.value) {
-        return 'Too many qualified teams for available slots';
+        return "Il y plus d'équipes qualifiées que de places";
     }
     const ticketedTeamsCount = ticketEntries.value.filter(e => e.team).length;
     if (remainingSlots.value > 0 && totalTickets.value === 0) {
-        return 'Add teams with tickets to fill remaining slots';
+        return 'Ajoutez des équipes pour compléter le nombre de places';
     }
     if (remainingSlots.value > ticketedTeamsCount) {
-        return `Need at least ${remainingSlots.value} teams with tickets to fill all slots`;
+        return `Il faut encore au moins ${remainingSlots.value} équipes pour compléter le tournoi`;
     }
     return null;
 });
@@ -198,7 +198,7 @@ function regenerate() {
                         :href="indexTournaments().url"
                         class="text-sm text-[#706f6c] hover:text-[#1b1b18] dark:text-[#A1A09A] dark:hover:text-[#EDEDEC]"
                     >
-                        &larr; Back to tournaments
+                        &larr; Liste des tournois
                     </Link>
                 </div>
             </nav>
@@ -206,9 +206,9 @@ function regenerate() {
 
         <main class="mx-auto w-full max-w-4xl p-6 lg:p-8">
             <div class="mb-6">
-                <h1 class="text-2xl font-bold">Generate Tournament Roster</h1>
+                <h1 class="text-2xl font-bold">Générer une composition de tournoi</h1>
                 <p class="text-[#706f6c] dark:text-[#A1A09A]">
-                    Create a roster using qualified teams and a ticket-based lottery.
+                    Créer un tournoi avec un système de lotterie avec tickets.
                 </p>
             </div>
 
@@ -216,7 +216,7 @@ function regenerate() {
                 <div class="flex flex-col gap-6">
                     <!-- Slots Input -->
                     <div class="grid gap-2">
-                        <Label for="slots">Number of slots</Label>
+                        <Label for="slots">Nombre de places</Label>
                         <Input
                             id="slots"
                             type="number"
@@ -228,7 +228,7 @@ function regenerate() {
 
                     <!-- Qualified Teams Section -->
                     <div class="grid gap-2">
-                        <Label>Qualified teams (automatically included)</Label>
+                        <Label>Équipes qualifiées (ajoutées automatiquement)</Label>
 
                         <!-- Selected tags -->
                         <div v-if="qualifiedTeams.length > 0" class="flex flex-wrap gap-2 mb-2">
@@ -254,11 +254,11 @@ function regenerate() {
                             :filter-function="() => true"
                         >
                             <ComboboxAnchor>
-                                <ComboboxInput placeholder="Search team to add..." />
+                                <ComboboxInput placeholder="Rechercher une équipe..." />
                                 <ComboboxTrigger />
                             </ComboboxAnchor>
                             <ComboboxContent>
-                                <ComboboxEmpty>No teams found.</ComboboxEmpty>
+                                <ComboboxEmpty>Aucune équipe trouvée.</ComboboxEmpty>
                                 <ComboboxItem
                                     v-for="team in availableTeamsForQualified"
                                     :key="team.id"
@@ -272,9 +272,9 @@ function regenerate() {
 
                     <!-- Ticket Entries Section -->
                     <div class="grid gap-2">
-                        <Label>Teams with tickets (lottery pool)</Label>
+                        <Label>Équipes avec tickets (lotterie)</Label>
                         <p class="text-sm text-[#706f6c] dark:text-[#A1A09A]">
-                            Remaining slots to fill: {{ remainingSlots }}
+                            Places restantes : {{ remainingSlots }}
                         </p>
 
                         <div class="flex flex-col gap-3 mt-2">
@@ -291,13 +291,13 @@ function regenerate() {
                                     >
                                         <ComboboxAnchor>
                                             <ComboboxInput
-                                                :placeholder="entry.team?.name ?? 'Select team...'"
+                                                :placeholder="entry.team?.name ?? 'Rechercher une équipe...'"
                                                 :display-value="(val: Team) => val?.name"
                                             />
                                             <ComboboxTrigger />
                                         </ComboboxAnchor>
                                         <ComboboxContent>
-                                            <ComboboxEmpty>No teams available.</ComboboxEmpty>
+                                            <ComboboxEmpty>Aucune équipe trouvée.</ComboboxEmpty>
                                             <ComboboxItem
                                                 v-for="team in getAvailableTeamsForEntry(index)"
                                                 :key="team.id"
@@ -335,7 +335,7 @@ function regenerate() {
 
                     <!-- Probability Display -->
                     <div v-if="probabilities.length > 0" class="grid gap-2">
-                        <Label>Selection probabilities</Label>
+                        <Label>Probabilités de sélection</Label>
                         <div class="rounded-lg border border-[#e3e3e0] bg-[#f8f8f7] p-4 dark:border-[#3E3E3A] dark:bg-[#1a1a19]">
                             <div class="flex flex-col gap-2">
                                 <div
@@ -362,7 +362,7 @@ function regenerate() {
                             @click="generate"
                             :disabled="!!validationError"
                         >
-                            Generate Roster
+                            Générer
                         </Button>
                     </div>
                 </div>
@@ -371,9 +371,9 @@ function regenerate() {
             <!-- Result Table -->
             <div v-if="generatedRoster" class="mt-8">
                 <div class="mb-4 flex items-center justify-between">
-                    <h2 class="text-xl font-bold">Generated Roster</h2>
+                    <h2 class="text-xl font-bold">Composition générée</h2>
                     <Button variant="outline" @click="regenerate">
-                        Regenerate
+                        Régénérer
                     </Button>
                 </div>
 
@@ -382,10 +382,10 @@ function regenerate() {
                         <thead>
                             <tr class="border-b border-[#e3e3e0] bg-[#f8f8f7] dark:border-[#3E3E3A] dark:bg-[#1a1a19]">
                                 <th class="px-6 py-3 text-left text-sm font-semibold">#</th>
-                                <th class="px-6 py-3 text-left text-sm font-semibold">Team</th>
-                                <th class="px-6 py-3 text-left text-sm font-semibold">Region</th>
-                                <th class="px-6 py-3 text-right text-sm font-semibold">Rating</th>
-                                <th class="px-6 py-3 text-left text-sm font-semibold">Status</th>
+                                <th class="px-6 py-3 text-left text-sm font-semibold">Équipe</th>
+                                <th class="px-6 py-3 text-left text-sm font-semibold">Région</th>
+                                <th class="px-6 py-3 text-right text-sm font-semibold">Classement</th>
+                                <th class="px-6 py-3 text-left text-sm font-semibold">Statut</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -416,13 +416,13 @@ function regenerate() {
                                         v-if="qualifiedTeams.find(t => t.id === team.id)"
                                         class="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800 dark:bg-green-900/30 dark:text-green-400"
                                     >
-                                        Qualified
+                                        Qualifié
                                     </span>
                                     <span
                                         v-else
                                         class="inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900/30 dark:text-blue-400"
                                     >
-                                        Lottery
+                                        Lotterie
                                     </span>
                                 </td>
                             </tr>

@@ -87,7 +87,7 @@ const filteredThirdPlaceTeams = computed(() => {
                         :href="showTournament(tournament.id).url"
                         class="text-sm text-[#706f6c] hover:text-[#1b1b18] dark:text-[#A1A09A] dark:hover:text-[#EDEDEC]"
                     >
-                        &larr; Back to tournament
+                        &larr; Liste des tournois
                     </Link>
                 </div>
             </nav>
@@ -95,8 +95,8 @@ const filteredThirdPlaceTeams = computed(() => {
 
         <main class="mx-auto w-full max-w-4xl p-6 lg:p-8">
             <div class="mb-6">
-                <h1 class="text-2xl font-bold">Edit Tournament</h1>
-                <p class="text-[#706f6c] dark:text-[#A1A09A]">Update tournament information.</p>
+                <h1 class="text-2xl font-bold">Éditer un tournoi</h1>
+                <p class="text-[#706f6c] dark:text-[#A1A09A]">Mettre à jour les informations d'un tournoi.</p>
             </div>
 
             <div
@@ -104,7 +104,7 @@ const filteredThirdPlaceTeams = computed(() => {
             >
                 <Form v-bind="update.form(tournament.id)" v-slot="{ errors, processing }" class="flex flex-col gap-6">
                     <div class="grid gap-2">
-                        <Label for="name">Name</Label>
+                        <Label for="name">Nom</Label>
                         <Input
                             id="name"
                             type="text"
@@ -126,7 +126,7 @@ const filteredThirdPlaceTeams = computed(() => {
                             :checked="tournament.is_major"
                             class="h-4 w-4 rounded border-[#e3e3e0] text-blue-600 focus:ring-blue-500 dark:border-[#3E3E3A] dark:bg-[#1a1a19]"
                         />
-                        <Label for="is_major" class="cursor-pointer">Major tournament</Label>
+                        <Label for="is_major" class="cursor-pointer">Tournoi majeur</Label>
                     </div>
 
                     <div class="flex items-center gap-3">
@@ -138,15 +138,15 @@ const filteredThirdPlaceTeams = computed(() => {
                             :checked="tournament.is_balancing"
                             class="h-4 w-4 rounded border-[#e3e3e0] text-blue-600 focus:ring-blue-500 dark:border-[#3E3E3A] dark:bg-[#1a1a19]"
                         />
-                        <Label for="is_balancing" class="cursor-pointer">Balancing tournament</Label>
+                        <Label for="is_balancing" class="cursor-pointer">Tournoi de rééquilibrage</Label>
                     </div>
 
                     <div class="grid gap-2">
-                        <Label>Winner</Label>
+                        <Label>Vainqueur</Label>
                         <input type="hidden" name="winner_team_id" :value="selectedWinner?.id ?? ''" />
                         <Combobox v-model="selectedWinner" v-model:search-term="winnerSearchTerm" :filter-function="() => true">
                             <ComboboxAnchor>
-                                <ComboboxInput :placeholder="selectedWinner?.name ?? 'Search team...'" :display-value="(val: Team) => val?.name" />
+                                <ComboboxInput :placeholder="selectedWinner?.name ?? 'Rechercher une équipe...'" :display-value="(val: Team) => val?.name" />
                                 <ComboboxTrigger />
                             </ComboboxAnchor>
                             <ComboboxContent>
@@ -160,11 +160,11 @@ const filteredThirdPlaceTeams = computed(() => {
                     </div>
 
                     <div class="grid gap-2">
-                        <Label>2nd Place</Label>
+                        <Label>Deuxième</Label>
                         <input type="hidden" name="second_place_team_id" :value="selectedSecondPlace?.id ?? ''" />
                         <Combobox v-model="selectedSecondPlace" v-model:search-term="secondPlaceSearchTerm" :filter-function="() => true">
                             <ComboboxAnchor>
-                                <ComboboxInput :placeholder="selectedSecondPlace?.name ?? 'Search team...'" :display-value="(val: Team) => val?.name" />
+                                <ComboboxInput :placeholder="selectedSecondPlace?.name ?? 'Rechercher une équipe...'" :display-value="(val: Team) => val?.name" />
                                 <ComboboxTrigger />
                             </ComboboxAnchor>
                             <ComboboxContent>
@@ -178,11 +178,11 @@ const filteredThirdPlaceTeams = computed(() => {
                     </div>
 
                     <div class="grid gap-2">
-                        <Label>3rd Place</Label>
+                        <Label>Troisième</Label>
                         <input type="hidden" name="third_place_team_id" :value="selectedThirdPlace?.id ?? ''" />
                         <Combobox v-model="selectedThirdPlace" v-model:search-term="thirdPlaceSearchTerm" :filter-function="() => true">
                             <ComboboxAnchor>
-                                <ComboboxInput :placeholder="selectedThirdPlace?.name ?? 'Search team...'" :display-value="(val: Team) => val?.name" />
+                                <ComboboxInput :placeholder="selectedThirdPlace?.name ?? 'Rechercher une équipe...'" :display-value="(val: Team) => val?.name" />
                                 <ComboboxTrigger />
                             </ComboboxAnchor>
                             <ComboboxContent>
@@ -198,7 +198,7 @@ const filteredThirdPlaceTeams = computed(() => {
                     <div class="flex justify-end">
                         <Button type="submit" :disabled="processing">
                             <Spinner v-if="processing" />
-                            Save Changes
+                            Valider les changements
                         </Button>
                     </div>
                 </Form>

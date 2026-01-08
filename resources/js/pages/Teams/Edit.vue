@@ -69,7 +69,7 @@ const filteredRegions = computed(() => {
                         :href="showTeam(team.id).url"
                         class="text-sm text-[#706f6c] hover:text-[#1b1b18] dark:text-[#A1A09A] dark:hover:text-[#EDEDEC]"
                     >
-                        &larr; Back to team
+                        &larr; Retour à l'équipe
                     </Link>
                 </div>
             </nav>
@@ -77,8 +77,8 @@ const filteredRegions = computed(() => {
 
         <main class="mx-auto w-full max-w-4xl p-6 lg:p-8">
             <div class="mb-6">
-                <h1 class="text-2xl font-bold">Edit Team</h1>
-                <p class="text-[#706f6c] dark:text-[#A1A09A]">Update team information.</p>
+                <h1 class="text-2xl font-bold">Éditer une équipe</h1>
+                <p class="text-[#706f6c] dark:text-[#A1A09A]">Modifier les données d'une équipe.</p>
             </div>
 
             <div
@@ -86,29 +86,29 @@ const filteredRegions = computed(() => {
             >
                 <Form v-bind="update.form(team.id)" v-slot="{ errors, processing }" class="flex flex-col gap-6">
                     <div class="grid gap-2">
-                        <Label for="name">Name</Label>
+                        <Label for="name">Nom</Label>
                         <Input
                             id="name"
                             type="text"
                             required
                             autofocus
                             name="name"
-                            placeholder="Team name"
+                            placeholder="Nom de l'équipe"
                             :default-value="team.name"
                         />
                         <InputError :message="errors.name" />
                     </div>
 
                     <div class="grid gap-2">
-                        <Label>Region</Label>
+                        <Label>Région</Label>
                         <input type="hidden" name="region_id" :value="selectedRegion?.id ?? ''" />
                         <Combobox v-model="selectedRegion" v-model:search-term="searchTerm" :filter-function="() => true">
                             <ComboboxAnchor>
-                                <ComboboxInput :placeholder="selectedRegion?.name ?? 'Search region...'" :display-value="(val: Region) => val?.name" />
+                                <ComboboxInput :placeholder="selectedRegion?.name ?? 'Rechercher une région...'" :display-value="(val: Region) => val?.name" />
                                 <ComboboxTrigger />
                             </ComboboxAnchor>
                             <ComboboxContent>
-                                <ComboboxEmpty>No regions found.</ComboboxEmpty>
+                                <ComboboxEmpty>Aucune région trouvée.</ComboboxEmpty>
                                 <ComboboxItem v-for="region in filteredRegions" :key="region.id" :value="region">
                                     {{ region.name }}
                                 </ComboboxItem>
@@ -120,7 +120,7 @@ const filteredRegions = computed(() => {
                     <div class="flex justify-end">
                         <Button type="submit" :disabled="processing">
                             <Spinner v-if="processing" />
-                            Save Changes
+                            Valider les changements
                         </Button>
                     </div>
                 </Form>

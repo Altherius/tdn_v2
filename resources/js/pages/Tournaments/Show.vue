@@ -109,7 +109,7 @@ function getTieResultClass(game: Game): string {
                         :href="indexTournaments().url"
                         class="text-sm text-[#706f6c] hover:text-[#1b1b18] dark:text-[#A1A09A] dark:hover:text-[#EDEDEC]"
                     >
-                        &larr; Back to tournaments
+                        &larr; Liste des tournois
                     </Link>
                 </div>
             </nav>
@@ -122,13 +122,13 @@ function getTieResultClass(game: Game): string {
                     :href="editTournament(tournament.id).url"
                     class="mt-2 inline-block text-sm text-[#706f6c] hover:text-[#1b1b18] dark:text-[#A1A09A] dark:hover:text-[#EDEDEC]"
                 >
-                    Edit tournament
+                    Éditer le tournoi
                 </Link>
             </div>
 
             <div class="mb-8 grid gap-4 md:grid-cols-3">
                 <div class="rounded-lg border border-[#e3e3e0] bg-white p-6 shadow-sm dark:border-[#3E3E3A] dark:bg-[#161615]">
-                    <p class="mb-2 text-sm font-medium text-[#706f6c] dark:text-[#A1A09A]">Winner</p>
+                    <p class="mb-2 text-sm font-medium text-[#706f6c] dark:text-[#A1A09A]">Vainqueur</p>
                     <Link
                         v-if="tournament.winner"
                         :href="showTeam(tournament.winner.id).url"
@@ -140,7 +140,7 @@ function getTieResultClass(game: Game): string {
                 </div>
 
                 <div class="rounded-lg border border-[#e3e3e0] bg-white p-6 shadow-sm dark:border-[#3E3E3A] dark:bg-[#161615]">
-                    <p class="mb-2 text-sm font-medium text-[#706f6c] dark:text-[#A1A09A]">2nd Place</p>
+                    <p class="mb-2 text-sm font-medium text-[#706f6c] dark:text-[#A1A09A]">Deuxième</p>
                     <Link
                         v-if="tournament.secondPlace"
                         :href="showTeam(tournament.secondPlace.id).url"
@@ -152,7 +152,7 @@ function getTieResultClass(game: Game): string {
                 </div>
 
                 <div class="rounded-lg border border-[#e3e3e0] bg-white p-6 shadow-sm dark:border-[#3E3E3A] dark:bg-[#161615]">
-                    <p class="mb-2 text-sm font-medium text-[#706f6c] dark:text-[#A1A09A]">3rd Place</p>
+                    <p class="mb-2 text-sm font-medium text-[#706f6c] dark:text-[#A1A09A]">Troisième</p>
                     <Link
                         v-if="tournament.thirdPlace"
                         :href="showTeam(tournament.thirdPlace.id).url"
@@ -164,22 +164,22 @@ function getTieResultClass(game: Game): string {
                 </div>
             </div>
 
-            <h2 class="mb-4 text-lg font-semibold">Games</h2>
+            <h2 class="mb-4 text-lg font-semibold">Liste des matchs</h2>
 
             <div class="overflow-hidden rounded-lg border border-[#e3e3e0] bg-white shadow-sm dark:border-[#3E3E3A] dark:bg-[#161615]">
                 <table class="w-full">
                     <thead>
                         <tr class="border-b border-[#e3e3e0] bg-[#f8f8f7] dark:border-[#3E3E3A] dark:bg-[#1a1a19]">
-                            <th class="px-6 py-3 text-left text-sm font-semibold">Teams</th>
-                            <th class="px-6 py-3 text-center text-sm font-semibold">Leg 1</th>
-                            <th class="px-6 py-3 text-center text-sm font-semibold">Leg 2</th>
-                            <th class="px-6 py-3 text-center text-sm font-semibold">Tie</th>
+                            <th class="px-6 py-3 text-left text-sm font-semibold">Équipes</th>
+                            <th class="px-6 py-3 text-center text-sm font-semibold">Aller</th>
+                            <th class="px-6 py-3 text-center text-sm font-semibold">Retour</th>
+                            <th class="px-6 py-3 text-center text-sm font-semibold">Total</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr v-if="games.length === 0">
                             <td colspan="4" class="px-6 py-8 text-center text-[#706f6c] dark:text-[#A1A09A]">
-                                No games in this tournament yet.
+                                Aucun match joué dans ce tournoi.
                             </td>
                         </tr>
                         <tr

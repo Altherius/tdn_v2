@@ -34,7 +34,7 @@ function toggleTheme() {
                         :href="indexTournaments().url"
                         class="text-sm text-[#706f6c] hover:text-[#1b1b18] dark:text-[#A1A09A] dark:hover:text-[#EDEDEC]"
                     >
-                        &larr; Back to tournaments
+                        &larr; Liste des tournois
                     </Link>
                 </div>
             </nav>
@@ -42,8 +42,8 @@ function toggleTheme() {
 
         <main class="mx-auto w-full max-w-4xl p-6 lg:p-8">
             <div class="mb-6">
-                <h1 class="text-2xl font-bold">Create Tournament</h1>
-                <p class="text-[#706f6c] dark:text-[#A1A09A]">Add a new tournament.</p>
+                <h1 class="text-2xl font-bold">Créer un tournoi</h1>
+                <p class="text-[#706f6c] dark:text-[#A1A09A]">Ajouter un nouveau tournoi.</p>
             </div>
 
             <div
@@ -51,8 +51,8 @@ function toggleTheme() {
             >
                 <Form v-bind="store.form()" v-slot="{ errors, processing }" class="flex flex-col gap-6">
                     <div class="grid gap-2">
-                        <Label for="name">Name</Label>
-                        <Input id="name" type="text" required autofocus name="name" placeholder="Tournament name" />
+                        <Label for="name">Nom</Label>
+                        <Input id="name" type="text" required autofocus name="name" placeholder="Nom du tournoi" />
                         <InputError :message="errors.name" />
                     </div>
 
@@ -64,7 +64,7 @@ function toggleTheme() {
                             value="1"
                             class="h-4 w-4 rounded border-[#e3e3e0] text-blue-600 focus:ring-blue-500 dark:border-[#3E3E3A] dark:bg-[#1a1a19]"
                         />
-                        <Label for="is_major" class="cursor-pointer">Major tournament</Label>
+                        <Label for="is_major" class="cursor-pointer">Tournoi majeur</Label>
                     </div>
 
                     <div class="flex items-center gap-3">
@@ -75,13 +75,13 @@ function toggleTheme() {
                             value="1"
                             class="h-4 w-4 rounded border-[#e3e3e0] text-blue-600 focus:ring-blue-500 dark:border-[#3E3E3A] dark:bg-[#1a1a19]"
                         />
-                        <Label for="is_balancing" class="cursor-pointer">Balancing tournament</Label>
+                        <Label for="is_balancing" class="cursor-pointer">Tournoi de rééquilibrage</Label>
                     </div>
 
                     <div class="flex justify-end">
                         <Button type="submit" :disabled="processing">
                             <Spinner v-if="processing" />
-                            Create Tournament
+                            Créer le tournoi
                         </Button>
                     </div>
                 </Form>
