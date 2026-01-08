@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\GameController;
 use App\Http\Controllers\TeamController;
 use App\Http\Controllers\TournamentController;
 use App\Models\Team;
@@ -8,11 +9,23 @@ use Inertia\Inertia;
 use Laravel\Fortify\Features;
 
 Route::get('/', function () {
+    $teams = Team::with('region')
+        ->orderByDesc('elo_rating')
+        ->get()
+        ->map(fn (Team $team) => [
+            'id' => $team->id,
+            'name' => $team->name,
+            'elo_rating' => $team->elo_rating,
+            'region' => $team->region,
+            'lastGames' => array_map(
+                fn ($result) => $result->value,
+                $team->getLastGameResults()
+            ),
+        ]);
+
     return Inertia::render('Welcome', [
         'canRegister' => Features::enabled(Features::registration()),
-        'teams' => Team::with('region')
-            ->orderByDesc('elo_rating')
-            ->get(),
+        'teams' => $teams,
     ]);
 })->name('home');
 
@@ -28,6 +41,9 @@ Route::post('teams', [TeamController::class, 'store'])->name('teams.store');
 Route::get('teams/edit/{team}', [TeamController::class, 'edit'])->name('teams.edit');
 Route::put('teams/{team}', [TeamController::class, 'update'])->name('teams.update');
 Route::get('teams/{team}', [TeamController::class, 'show'])->name('teams.show');
+
+Route::get('games/new', [GameController::class, 'create'])->name('games.create');
+Route::post('games', [GameController::class, 'store'])->name('games.store');
 
 Route::get('dashboard', function () {
     return Inertia::render('Dashboard');

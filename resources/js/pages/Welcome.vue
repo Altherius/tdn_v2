@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { create as createGame } from '@/actions/App/Http/Controllers/GameController';
 import { create as createTeam, show as showTeam } from '@/actions/App/Http/Controllers/TeamController';
 import { index as indexTournaments } from '@/actions/App/Http/Controllers/TournamentController';
 import { useAppearance } from '@/composables/useAppearance';
@@ -11,11 +12,14 @@ interface Region {
     name: string;
 }
 
+type GameResult = 'win' | 'draw' | 'loss';
+
 interface Team {
     id: number;
     name: string;
     elo_rating: number;
     region: Region;
+    lastGames: GameResult[];
 }
 
 withDefaults(
@@ -34,6 +38,7 @@ const { resolvedAppearance, updateAppearance } = useAppearance();
 function toggleTheme() {
     updateAppearance(resolvedAppearance.value === 'dark' ? 'light' : 'dark');
 }
+
 </script>
 
 <template>
@@ -61,6 +66,12 @@ function toggleTheme() {
                         class="text-sm text-[#706f6c] hover:text-[#1b1b18] dark:text-[#A1A09A] dark:hover:text-[#EDEDEC]"
                     >
                         + Create Team
+                    </Link>
+                    <Link
+                        :href="createGame().url"
+                        class="text-sm text-[#706f6c] hover:text-[#1b1b18] dark:text-[#A1A09A] dark:hover:text-[#EDEDEC]"
+                    >
+                        + Create Game
                     </Link>
                 </div>
 
@@ -101,6 +112,7 @@ function toggleTheme() {
                             <th class="px-6 py-3 text-left text-sm font-semibold">Team</th>
                             <th class="px-6 py-3 text-left text-sm font-semibold">Region</th>
                             <th class="px-6 py-3 text-right text-sm font-semibold">Rating</th>
+                            <th class="px-6 py-3 text-left text-sm font-semibold">Last games</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -119,6 +131,21 @@ function toggleTheme() {
                             </td>
                             <td class="px-6 py-4 text-sm text-[#706f6c] dark:text-[#A1A09A]">{{ team.region.name }}</td>
                             <td class="px-6 py-4 text-right text-sm font-mono">{{ team.elo_rating }}</td>
+                            <td class="px-6 py-4">
+                                <div class="flex gap-1">
+                                    <span
+                                        v-for="(result, index) in [...team.lastGames].reverse()"
+                                        :key="index"
+                                        class="h-3 w-3 rounded-full"
+                                        :class="{
+                                            'bg-green-500': result === 'win',
+                                            'bg-yellow-500': result === 'draw',
+                                            'bg-red-500': result === 'loss',
+                                        }"
+                                        :title="result"
+                                    />
+                                </div>
+                            </td>
                         </tr>
                     </tbody>
                 </table>

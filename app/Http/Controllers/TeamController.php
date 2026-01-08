@@ -29,7 +29,7 @@ class TeamController extends Controller
     {
         return Inertia::render('Teams/Show', [
             'team' => $team->load('region'),
-            'games' => $team->games()->with(['team1', 'team2', 'tournament'])->get(),
+            'games' => $team->games()->with(['team1', 'team2', 'tournament'])->orderByDesc('created_at')->get(),
             'eloHistory' => $team->eloHistory()->orderBy('created_at')->get(),
         ]);
     }
