@@ -1,6 +1,15 @@
 <script setup lang="ts">
 import InputError from '@/components/InputError.vue';
 import { Button } from '@/components/ui/button';
+import {
+    Combobox,
+    ComboboxAnchor,
+    ComboboxContent,
+    ComboboxEmpty,
+    ComboboxInput,
+    ComboboxItem,
+    ComboboxTrigger,
+} from '@/components/ui/combobox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
@@ -8,6 +17,7 @@ import { useAppearance } from '@/composables/useAppearance';
 import { show as showTeam, update } from '@/actions/App/Http/Controllers/TeamController';
 import { Form, Head, Link } from '@inertiajs/vue3';
 import { Moon, Sun } from 'lucide-vue-next';
+import { computed, ref } from 'vue';
 
 interface Region {
     id: number;
@@ -31,6 +41,14 @@ const { resolvedAppearance, updateAppearance } = useAppearance();
 function toggleTheme() {
     updateAppearance(resolvedAppearance.value === 'dark' ? 'light' : 'dark');
 }
+
+const selectedRegion = ref<Region | undefined>(props.regions.find((r) => r.id === props.team.region_id));
+const searchTerm = ref('');
+
+const filteredRegions = computed(() => {
+    if (!searchTerm.value) return props.regions;
+    return props.regions.filter((region) => region.name.toLowerCase().includes(searchTerm.value.toLowerCase()));
+});
 </script>
 
 <template>
@@ -82,17 +100,20 @@ function toggleTheme() {
                     </div>
 
                     <div class="grid gap-2">
-                        <Label for="region_id">Region</Label>
-                        <select
-                            id="region_id"
-                            name="region_id"
-                            required
-                            class="h-9 w-full rounded-md border border-[#e3e3e0] bg-transparent px-3 py-1 text-base shadow-xs outline-none transition-[color,box-shadow] focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 dark:border-[#3E3E3A] dark:bg-[#1a1a19] md:text-sm"
-                        >
-                            <option v-for="region in regions" :key="region.id" :value="region.id" :selected="region.id === team.region_id">
-                                {{ region.name }}
-                            </option>
-                        </select>
+                        <Label>Region</Label>
+                        <input type="hidden" name="region_id" :value="selectedRegion?.id ?? ''" />
+                        <Combobox v-model="selectedRegion" v-model:search-term="searchTerm" :filter-function="() => true">
+                            <ComboboxAnchor>
+                                <ComboboxInput :placeholder="selectedRegion?.name ?? 'Search region...'" :display-value="(val: Region) => val?.name" />
+                                <ComboboxTrigger />
+                            </ComboboxAnchor>
+                            <ComboboxContent>
+                                <ComboboxEmpty>No regions found.</ComboboxEmpty>
+                                <ComboboxItem v-for="region in filteredRegions" :key="region.id" :value="region">
+                                    {{ region.name }}
+                                </ComboboxItem>
+                            </ComboboxContent>
+                        </Combobox>
                         <InputError :message="errors.region_id" />
                     </div>
 

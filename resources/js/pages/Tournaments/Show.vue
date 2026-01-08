@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { index as indexTournaments } from '@/actions/App/Http/Controllers/TournamentController';
+import { edit as editTournament, index as indexTournaments } from '@/actions/App/Http/Controllers/TournamentController';
 import { show as showTeam } from '@/actions/App/Http/Controllers/TeamController';
 import { useAppearance } from '@/composables/useAppearance';
 import { Head, Link } from '@inertiajs/vue3';
@@ -30,7 +30,7 @@ interface Game {
     leg2_team2_score: number | null;
 }
 
-defineProps<{
+const props = defineProps<{
     tournament: Tournament;
     games: Game[];
 }>();
@@ -116,7 +116,15 @@ function getTieResultClass(game: Game): string {
         </header>
 
         <main class="mx-auto w-full max-w-4xl p-6 lg:p-8">
-            <h1 class="mb-6 text-2xl font-bold">{{ tournament.name }}</h1>
+            <div class="mb-6">
+                <h1 class="text-2xl font-bold">{{ tournament.name }}</h1>
+                <Link
+                    :href="editTournament(tournament.id).url"
+                    class="mt-2 inline-block text-sm text-[#706f6c] hover:text-[#1b1b18] dark:text-[#A1A09A] dark:hover:text-[#EDEDEC]"
+                >
+                    Edit tournament
+                </Link>
+            </div>
 
             <div class="mb-8 grid gap-4 md:grid-cols-3">
                 <div class="rounded-lg border border-[#e3e3e0] bg-white p-6 shadow-sm dark:border-[#3E3E3A] dark:bg-[#161615]">
