@@ -110,3 +110,20 @@ it('generate roster page includes teams with regions', function () {
         ->has('teams.0.region')
     );
 });
+
+it('index page includes is_major and is_balancing properties', function () {
+    Tournament::factory()->create([
+        'is_major' => true,
+        'is_balancing' => true,
+    ]);
+
+    $response = $this->get('/tournaments');
+
+    $response->assertSuccessful();
+    $response->assertInertia(fn (AssertableInertia $page) => $page
+        ->component('Tournaments/Index')
+        ->has('tournaments', 1)
+        ->where('tournaments.0.is_major', true)
+        ->where('tournaments.0.is_balancing', true)
+    );
+});

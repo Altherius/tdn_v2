@@ -24,6 +24,6 @@ class GameController extends Controller
     {
         Game::create($request->validated());
 
-        return redirect()->route('games.create')->with('success', 'Game created successfully.');
+        return redirect()->route('games.create')->with('success', 'Match créé avec succès.');
     }
 }

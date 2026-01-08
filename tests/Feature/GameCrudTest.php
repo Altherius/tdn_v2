@@ -45,7 +45,7 @@ it('can create a game with all scores', function () {
     expect($game->leg2_team2_score)->toBe(3);
 
     $response->assertRedirect('/games/new');
-    $response->assertSessionHas('success', 'Game created successfully.');
+    $response->assertSessionHas('success', 'Match créé avec succès.');
 });
 
 it('can create a game without tournament', function () {

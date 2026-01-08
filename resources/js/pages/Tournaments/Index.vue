@@ -5,6 +5,7 @@ import { create as createTournament, generateRoster, show as showTournament } fr
 import { show as showTeam } from '@/actions/App/Http/Controllers/TeamController';
 import { home } from '@/routes';
 import { Head, Link } from '@inertiajs/vue3';
+import { Scale } from 'lucide-vue-next';
 
 interface Team {
     id: number;
@@ -14,6 +15,8 @@ interface Team {
 interface Tournament {
     id: number;
     name: string;
+    is_major: boolean;
+    is_balancing: boolean;
     winner: Team | null;
     secondPlace: Team | null;
     thirdPlace: Team | null;
@@ -68,6 +71,7 @@ defineProps<{
                             v-for="tournament in tournaments"
                             :key="tournament.id"
                             class="border-b border-[#e3e3e0] last:border-b-0 dark:border-[#3E3E3A]"
+                            :class="tournament.is_major ? 'bg-amber-50 dark:bg-amber-950/30' : ''"
                         >
                             <td class="px-6 py-4 text-sm font-medium">
                                 <Link
@@ -76,6 +80,11 @@ defineProps<{
                                 >
                                     {{ tournament.name }}
                                 </Link>
+                                <Scale
+                                    v-if="tournament.is_balancing"
+                                    class="ml-1.5 inline-block h-4 w-4 text-[#706f6c] dark:text-[#A1A09A]"
+                                    title="Tournoi d'équilibrage"
+                                />
                             </td>
                             <td class="px-6 py-4 text-sm">
                                 <Link
