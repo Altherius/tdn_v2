@@ -4,8 +4,12 @@ import { create as createTeam } from '@/actions/App/Http/Controllers/TeamControl
 import { index as indexTournaments } from '@/actions/App/Http/Controllers/TournamentController';
 import { useAppearance } from '@/composables/useAppearance';
 import { home, login, logout } from '@/routes';
-import { Link, router } from '@inertiajs/vue3';
+import { Link, router, usePage } from '@inertiajs/vue3';
 import { LogOut, Moon, Sun, User } from 'lucide-vue-next';
+import { computed } from 'vue';
+
+const page = usePage();
+const currentPath = computed(() => page.url.split('?')[0]);
 
 const { resolvedAppearance, updateAppearance } = useAppearance();
 
@@ -24,25 +28,29 @@ function handleLogout() {
             <div class="flex items-center gap-4">
                 <Link
                     :href="home().url"
-                    class="text-sm text-[#706f6c] hover:text-[#1b1b18] dark:text-[#A1A09A] dark:hover:text-[#EDEDEC]"
+                    class="text-sm hover:text-[#1b1b18] dark:hover:text-[#EDEDEC]"
+                    :class="currentPath === home().url ? 'font-medium text-[#1b1b18] dark:text-[#EDEDEC]' : 'text-[#706f6c] dark:text-[#A1A09A]'"
                 >
                     Classement
                 </Link>
                 <Link
                     :href="indexTournaments().url"
-                    class="text-sm text-[#706f6c] hover:text-[#1b1b18] dark:text-[#A1A09A] dark:hover:text-[#EDEDEC]"
+                    class="text-sm hover:text-[#1b1b18] dark:hover:text-[#EDEDEC]"
+                    :class="currentPath === indexTournaments().url ? 'font-medium text-[#1b1b18] dark:text-[#EDEDEC]' : 'text-[#706f6c] dark:text-[#A1A09A]'"
                 >
                     Tournois
                 </Link>
                 <Link
                     :href="createTeam().url"
-                    class="text-sm text-[#706f6c] hover:text-[#1b1b18] dark:text-[#A1A09A] dark:hover:text-[#EDEDEC]"
+                    class="text-sm hover:text-[#1b1b18] dark:hover:text-[#EDEDEC]"
+                    :class="currentPath === createTeam().url ? 'font-medium text-[#1b1b18] dark:text-[#EDEDEC]' : 'text-[#706f6c] dark:text-[#A1A09A]'"
                 >
                     Créer une équipe
                 </Link>
                 <Link
                     :href="createGame().url"
-                    class="text-sm text-[#706f6c] hover:text-[#1b1b18] dark:text-[#A1A09A] dark:hover:text-[#EDEDEC]"
+                    class="text-sm hover:text-[#1b1b18] dark:hover:text-[#EDEDEC]"
+                    :class="currentPath === createGame().url ? 'font-medium text-[#1b1b18] dark:text-[#EDEDEC]' : 'text-[#706f6c] dark:text-[#A1A09A]'"
                 >
                     Créer un match
                 </Link>
