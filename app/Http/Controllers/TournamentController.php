@@ -54,4 +54,11 @@ class TournamentController extends Controller
 
         return redirect()->route('tournaments.show', $tournament);
     }
+
+    public function generateRoster(): Response
+    {
+        return Inertia::render('Tournaments/GenerateRoster', [
+            'teams' => Team::with('region')->orderBy('name')->get(),
+        ]);
+    }
 }

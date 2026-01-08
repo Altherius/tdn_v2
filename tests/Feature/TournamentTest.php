@@ -3,6 +3,7 @@
 use App\Models\Game;
 use App\Models\Team;
 use App\Models\Tournament;
+use Inertia\Testing\AssertableInertia;
 
 it('can create a tournament', function () {
     $tournament = Tournament::factory()->create([
@@ -84,4 +85,28 @@ it('can have all three different team placements', function () {
     expect($tournament->winner->name)->toBe('Winner');
     expect($tournament->secondPlace->name)->toBe('Second');
     expect($tournament->thirdPlace->name)->toBe('Third');
+});
+
+it('can render generate roster page', function () {
+    Team::factory()->count(5)->create();
+
+    $response = $this->get('/tournaments/generate-roster');
+
+    $response->assertSuccessful();
+    $response->assertInertia(fn (AssertableInertia $page) => $page
+        ->component('Tournaments/GenerateRoster')
+        ->has('teams', 5)
+    );
+});
+
+it('generate roster page includes teams with regions', function () {
+    $team = Team::factory()->create();
+
+    $response = $this->get('/tournaments/generate-roster');
+
+    $response->assertSuccessful();
+    $response->assertInertia(fn (AssertableInertia $page) => $page
+        ->component('Tournaments/GenerateRoster')
+        ->has('teams.0.region')
+    );
 });

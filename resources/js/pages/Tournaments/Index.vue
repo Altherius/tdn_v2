@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { create as createTournament, show as showTournament } from '@/actions/App/Http/Controllers/TournamentController';
+import { create as createTournament, generateRoster, show as showTournament } from '@/actions/App/Http/Controllers/TournamentController';
 import { show as showTeam } from '@/actions/App/Http/Controllers/TeamController';
 import { useAppearance } from '@/composables/useAppearance';
 import { home } from '@/routes';
@@ -57,12 +57,20 @@ function toggleTheme() {
         <main class="mx-auto w-full max-w-4xl p-6 lg:p-8">
             <div class="mb-6">
                 <h1 class="text-2xl font-bold">Tournaments</h1>
-                <Link
-                    :href="createTournament().url"
-                    class="mt-2 inline-block text-sm text-[#706f6c] hover:text-[#1b1b18] dark:text-[#A1A09A] dark:hover:text-[#EDEDEC]"
-                >
-                    + Create tournament
-                </Link>
+                <div class="flex gap-4">
+                    <Link
+                        :href="createTournament().url"
+                        class="mt-2 inline-block text-sm text-[#706f6c] hover:text-[#1b1b18] dark:text-[#A1A09A] dark:hover:text-[#EDEDEC]"
+                    >
+                        + Create tournament
+                    </Link>
+                    <Link
+                        :href="generateRoster().url"
+                        class="mt-2 inline-block text-sm text-[#706f6c] hover:text-[#1b1b18] dark:text-[#A1A09A] dark:hover:text-[#EDEDEC]"
+                    >
+                        Generate roster
+                    </Link>
+                </div>
             </div>
 
             <div class="overflow-hidden rounded-lg border border-[#e3e3e0] bg-white shadow-sm dark:border-[#3E3E3A] dark:bg-[#161615]">
