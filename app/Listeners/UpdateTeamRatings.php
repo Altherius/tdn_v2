@@ -39,13 +39,15 @@ class UpdateTeamRatings
         $team1Points = $this->eloRatingService->calculatePointsExchange(
             $team1->elo_rating,
             $team2->elo_rating,
-            $team1Result
+            $team1Result,
+            abs($game->totalTeam1Score() - $game->totalTeam2Score())
         );
 
         $team2Points = $this->eloRatingService->calculatePointsExchange(
             $team2->elo_rating,
             $team1->elo_rating,
-            $team2Result
+            $team2Result,
+            abs($game->totalTeam1Score() - $game->totalTeam2Score())
         );
 
         $team1NewRating = $team1->elo_rating + $team1Points;
