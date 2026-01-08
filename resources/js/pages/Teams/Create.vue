@@ -19,6 +19,7 @@ import { store } from '@/actions/App/Http/Controllers/TeamController';
 import { Form, Head, Link } from '@inertiajs/vue3';
 import { Moon, Sun } from 'lucide-vue-next';
 import { computed, ref } from 'vue';
+import Navbar from '@/components/Navbar.vue';
 
 interface Region {
     id: number;
@@ -45,28 +46,9 @@ const filteredRegions = computed(() => {
 </script>
 
 <template>
-    <Head title="Create Team" />
+    <Head title="Créer une équipe" />
     <div class="flex min-h-screen flex-col bg-[#FDFDFC] text-[#1b1b18] dark:bg-[#0a0a0a] dark:text-[#EDEDEC]">
-        <header class="w-full border-b border-[#e3e3e0] bg-white px-6 py-4 dark:border-[#3E3E3A] dark:bg-[#161615]">
-            <nav class="mx-auto flex max-w-4xl items-center justify-between">
-                <div class="flex items-center gap-4">
-                    <button
-                        @click="toggleTheme"
-                        class="flex h-9 w-9 items-center justify-center rounded-md border border-[#e3e3e0] bg-[#FDFDFC] transition-colors hover:bg-[#f5f5f4] dark:border-[#3E3E3A] dark:bg-[#1a1a19] dark:hover:bg-[#252524]"
-                        :title="resolvedAppearance === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'"
-                    >
-                        <Sun v-if="resolvedAppearance === 'dark'" class="h-5 w-5" />
-                        <Moon v-else class="h-5 w-5" />
-                    </button>
-                    <Link
-                        :href="home()"
-                        class="text-sm text-[#706f6c] hover:text-[#1b1b18] dark:text-[#A1A09A] dark:hover:text-[#EDEDEC]"
-                    >
-                        &larr; Retour au classement
-                    </Link>
-                </div>
-            </nav>
-        </header>
+        <Navbar />
 
         <main class="mx-auto w-full max-w-4xl p-6 lg:p-8">
             <div class="mb-6">

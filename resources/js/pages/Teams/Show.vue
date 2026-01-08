@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { edit as editTeam, show as showTeam } from '@/actions/App/Http/Controllers/TeamController';
-import { show as showTournament } from '@/actions/App/Http/Controllers/TournamentController';
+import { index as indexTournaments, show as showTournament } from '@/actions/App/Http/Controllers/TournamentController';
 import { useAppearance } from '@/composables/useAppearance';
 import { home } from '@/routes';
 import { Head, Link } from '@inertiajs/vue3';
@@ -17,6 +17,12 @@ import {
 import { Moon, Sun } from 'lucide-vue-next';
 import { computed } from 'vue';
 import { Line } from 'vue-chartjs';
+import Navbar from '@/components/Navbar.vue';
+import Breadcrumb from '@/components/Breadcrumb.vue';
+const breadcrumbs: BreadcrumbItem[] = [
+    { label: 'Classement', href: indexTournaments().url },
+    { label: 'Détail' },
+];
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
@@ -194,28 +200,10 @@ const chartOptions = computed(() => {
 <template>
     <Head :title="team.name" />
     <div class="flex min-h-screen flex-col bg-[#FDFDFC] text-[#1b1b18] dark:bg-[#0a0a0a] dark:text-[#EDEDEC]">
-        <header class="w-full border-b border-[#e3e3e0] bg-white px-6 py-4 dark:border-[#3E3E3A] dark:bg-[#161615]">
-            <nav class="mx-auto flex max-w-4xl items-center justify-between">
-                <div class="flex items-center gap-4">
-                    <button
-                        @click="toggleTheme"
-                        class="flex h-9 w-9 items-center justify-center rounded-md border border-[#e3e3e0] bg-[#FDFDFC] transition-colors hover:bg-[#f5f5f4] dark:border-[#3E3E3A] dark:bg-[#1a1a19] dark:hover:bg-[#252524]"
-                        :title="resolvedAppearance === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'"
-                    >
-                        <Sun v-if="resolvedAppearance === 'dark'" class="h-5 w-5" />
-                        <Moon v-else class="h-5 w-5" />
-                    </button>
-                    <Link
-                        :href="home()"
-                        class="text-sm text-[#706f6c] hover:text-[#1b1b18] dark:text-[#A1A09A] dark:hover:text-[#EDEDEC]"
-                    >
-                        &larr; Retour au classement
-                    </Link>
-                </div>
-            </nav>
-        </header>
+        <Navbar />
 
         <main class="mx-auto w-full max-w-4xl p-6 lg:p-8">
+            <Breadcrumb :items="breadcrumbs" />
             <div class="mb-6">
                 <h1 class="text-2xl font-bold">{{ team.name }}</h1>
                 <p class="text-[#706f6c] dark:text-[#A1A09A]">

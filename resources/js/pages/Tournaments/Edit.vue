@@ -1,5 +1,7 @@
 <script setup lang="ts">
+import Breadcrumb, { type BreadcrumbItem } from '@/components/Breadcrumb.vue';
 import InputError from '@/components/InputError.vue';
+import Navbar from '@/components/Navbar.vue';
 import { Button } from '@/components/ui/button';
 import {
     Combobox,
@@ -13,10 +15,9 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
-import { useAppearance } from '@/composables/useAppearance';
-import { show as showTournament, update } from '@/actions/App/Http/Controllers/TournamentController';
-import { Form, Head, Link } from '@inertiajs/vue3';
-import { Moon, Sun } from 'lucide-vue-next';
+import { index as indexTournaments, show as showTournament, update } from '@/actions/App/Http/Controllers/TournamentController';
+import { home } from '@/routes';
+import { Form, Head } from '@inertiajs/vue3';
 import { computed, ref } from 'vue';
 
 interface Team {
@@ -39,11 +40,11 @@ const props = defineProps<{
     teams: Team[];
 }>();
 
-const { resolvedAppearance, updateAppearance } = useAppearance();
-
-function toggleTheme() {
-    updateAppearance(resolvedAppearance.value === 'dark' ? 'light' : 'dark');
-}
+const breadcrumbs: BreadcrumbItem[] = [
+    { label: 'Tournois', href: indexTournaments().url },
+    { label: props.tournament.name, href: showTournament(props.tournament.id).url },
+    { label: 'Éditer' },
+];
 
 const selectedWinner = ref<Team | undefined>(props.teams.find((t) => t.id === props.tournament.winner_team_id));
 const selectedSecondPlace = ref<Team | undefined>(props.teams.find((t) => t.id === props.tournament.second_place_team_id));
@@ -70,30 +71,12 @@ const filteredThirdPlaceTeams = computed(() => {
 </script>
 
 <template>
-    <Head :title="`Edit ${tournament.name}`" />
+    <Head :title="`Éditer ${tournament.name}`" />
     <div class="flex min-h-screen flex-col bg-[#FDFDFC] text-[#1b1b18] dark:bg-[#0a0a0a] dark:text-[#EDEDEC]">
-        <header class="w-full border-b border-[#e3e3e0] bg-white px-6 py-4 dark:border-[#3E3E3A] dark:bg-[#161615]">
-            <nav class="mx-auto flex max-w-4xl items-center justify-between">
-                <div class="flex items-center gap-4">
-                    <button
-                        @click="toggleTheme"
-                        class="flex h-9 w-9 items-center justify-center rounded-md border border-[#e3e3e0] bg-[#FDFDFC] transition-colors hover:bg-[#f5f5f4] dark:border-[#3E3E3A] dark:bg-[#1a1a19] dark:hover:bg-[#252524]"
-                        :title="resolvedAppearance === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'"
-                    >
-                        <Sun v-if="resolvedAppearance === 'dark'" class="h-5 w-5" />
-                        <Moon v-else class="h-5 w-5" />
-                    </button>
-                    <Link
-                        :href="showTournament(tournament.id).url"
-                        class="text-sm text-[#706f6c] hover:text-[#1b1b18] dark:text-[#A1A09A] dark:hover:text-[#EDEDEC]"
-                    >
-                        &larr; Liste des tournois
-                    </Link>
-                </div>
-            </nav>
-        </header>
+        <Navbar />
 
         <main class="mx-auto w-full max-w-4xl p-6 lg:p-8">
+            <Breadcrumb :items="breadcrumbs" />
             <div class="mb-6">
                 <h1 class="text-2xl font-bold">Éditer un tournoi</h1>
                 <p class="text-[#706f6c] dark:text-[#A1A09A]">Mettre à jour les informations d'un tournoi.</p>
@@ -111,7 +94,7 @@ const filteredThirdPlaceTeams = computed(() => {
                             required
                             autofocus
                             name="name"
-                            placeholder="Tournament name"
+                            placeholder="Nom du tournoi"
                             :default-value="tournament.name"
                         />
                         <InputError :message="errors.name" />
@@ -150,7 +133,7 @@ const filteredThirdPlaceTeams = computed(() => {
                                 <ComboboxTrigger />
                             </ComboboxAnchor>
                             <ComboboxContent>
-                                <ComboboxEmpty>No teams found.</ComboboxEmpty>
+                                <ComboboxEmpty>Aucune équipe trouvée.</ComboboxEmpty>
                                 <ComboboxItem v-for="team in filteredWinnerTeams" :key="team.id" :value="team">
                                     {{ team.name }}
                                 </ComboboxItem>
@@ -168,7 +151,7 @@ const filteredThirdPlaceTeams = computed(() => {
                                 <ComboboxTrigger />
                             </ComboboxAnchor>
                             <ComboboxContent>
-                                <ComboboxEmpty>No teams found.</ComboboxEmpty>
+                                <ComboboxEmpty>Aucune équipe trouvée.</ComboboxEmpty>
                                 <ComboboxItem v-for="team in filteredSecondPlaceTeams" :key="team.id" :value="team">
                                     {{ team.name }}
                                 </ComboboxItem>
@@ -186,7 +169,7 @@ const filteredThirdPlaceTeams = computed(() => {
                                 <ComboboxTrigger />
                             </ComboboxAnchor>
                             <ComboboxContent>
-                                <ComboboxEmpty>No teams found.</ComboboxEmpty>
+                                <ComboboxEmpty>Aucune équipe trouvée.</ComboboxEmpty>
                                 <ComboboxItem v-for="team in filteredThirdPlaceTeams" :key="team.id" :value="team">
                                     {{ team.name }}
                                 </ComboboxItem>

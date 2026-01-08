@@ -1,46 +1,28 @@
 <script setup lang="ts">
+import Breadcrumb, { type BreadcrumbItem } from '@/components/Breadcrumb.vue';
 import InputError from '@/components/InputError.vue';
+import Navbar from '@/components/Navbar.vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
-import { useAppearance } from '@/composables/useAppearance';
 import { index as indexTournaments, store } from '@/actions/App/Http/Controllers/TournamentController';
-import { Form, Head, Link } from '@inertiajs/vue3';
-import { Moon, Sun } from 'lucide-vue-next';
+import { home } from '@/routes';
+import { Form, Head } from '@inertiajs/vue3';
 
-const { resolvedAppearance, updateAppearance } = useAppearance();
-
-function toggleTheme() {
-    updateAppearance(resolvedAppearance.value === 'dark' ? 'light' : 'dark');
-}
+const breadcrumbs: BreadcrumbItem[] = [
+    { label: 'Tournois', href: indexTournaments().url },
+    { label: 'Créer' },
+];
 </script>
 
 <template>
-    <Head title="Create Tournament" />
+    <Head title="Créer un tournoi" />
     <div class="flex min-h-screen flex-col bg-[#FDFDFC] text-[#1b1b18] dark:bg-[#0a0a0a] dark:text-[#EDEDEC]">
-        <header class="w-full border-b border-[#e3e3e0] bg-white px-6 py-4 dark:border-[#3E3E3A] dark:bg-[#161615]">
-            <nav class="mx-auto flex max-w-4xl items-center justify-between">
-                <div class="flex items-center gap-4">
-                    <button
-                        @click="toggleTheme"
-                        class="flex h-9 w-9 items-center justify-center rounded-md border border-[#e3e3e0] bg-[#FDFDFC] transition-colors hover:bg-[#f5f5f4] dark:border-[#3E3E3A] dark:bg-[#1a1a19] dark:hover:bg-[#252524]"
-                        :title="resolvedAppearance === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'"
-                    >
-                        <Sun v-if="resolvedAppearance === 'dark'" class="h-5 w-5" />
-                        <Moon v-else class="h-5 w-5" />
-                    </button>
-                    <Link
-                        :href="indexTournaments().url"
-                        class="text-sm text-[#706f6c] hover:text-[#1b1b18] dark:text-[#A1A09A] dark:hover:text-[#EDEDEC]"
-                    >
-                        &larr; Liste des tournois
-                    </Link>
-                </div>
-            </nav>
-        </header>
+        <Navbar />
 
         <main class="mx-auto w-full max-w-4xl p-6 lg:p-8">
+            <Breadcrumb :items="breadcrumbs" />
             <div class="mb-6">
                 <h1 class="text-2xl font-bold">Créer un tournoi</h1>
                 <p class="text-[#706f6c] dark:text-[#A1A09A]">Ajouter un nouveau tournoi.</p>
