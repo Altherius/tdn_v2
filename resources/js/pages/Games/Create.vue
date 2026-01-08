@@ -65,8 +65,8 @@ const filteredTeams2 = computed(() => {
     return props.teams.filter((t) => t.name.toLowerCase().includes(team2SearchTerm.value.toLowerCase()));
 });
 
-const team1Name = computed(() => selectedTeam1.value?.name ?? 'Hosting team');
-const team2Name = computed(() => selectedTeam2.value?.name ?? 'Receiving team');
+const team1Name = computed(() => selectedTeam1.value?.name ?? 'Domicile');
+const team2Name = computed(() => selectedTeam2.value?.name ?? 'Visiteur');
 
 const leg1Team1Score = ref<number | undefined>(undefined);
 const leg1Team2Score = ref<number | undefined>(undefined);
@@ -135,7 +135,7 @@ watch(
                         :href="home()"
                         class="text-sm text-[#706f6c] hover:text-[#1b1b18] dark:text-[#A1A09A] dark:hover:text-[#EDEDEC]"
                     >
-                        &larr; Back to rankings
+                        &larr; Retour au classement
                     </Link>
                 </div>
             </nav>
@@ -143,8 +143,8 @@ watch(
 
         <main class="mx-auto w-full max-w-4xl p-6 lg:p-8">
             <div class="mb-6">
-                <h1 class="text-2xl font-bold">Create Game</h1>
-                <p class="text-[#706f6c] dark:text-[#A1A09A]">Record a new game result.</p>
+                <h1 class="text-2xl font-bold">Créer un match</h1>
+                <p class="text-[#706f6c] dark:text-[#A1A09A]">Enregistrer le résultat d'un match.</p>
             </div>
 
             <div
@@ -152,7 +152,7 @@ watch(
             >
                 <form @submit.prevent="submitForm" class="flex flex-col gap-6">
                     <div class="grid gap-2">
-                        <Label>Tournament (optional)</Label>
+                        <Label>Tournoi (optionnel)</Label>
                         <Combobox
                             v-model="selectedTournament"
                             v-model:search-term="tournamentSearchTerm"
@@ -160,13 +160,13 @@ watch(
                         >
                             <ComboboxAnchor>
                                 <ComboboxInput
-                                    :placeholder="selectedTournament?.name ?? 'Search tournament...'"
+                                    :placeholder="selectedTournament?.name ?? 'Rechercher un tournoi...'"
                                     :display-value="(val: Tournament) => val?.name"
                                 />
                                 <ComboboxTrigger />
                             </ComboboxAnchor>
                             <ComboboxContent>
-                                <ComboboxEmpty>No tournaments found.</ComboboxEmpty>
+                                <ComboboxEmpty>Aucun tournoi trouvé.</ComboboxEmpty>
                                 <ComboboxItem v-for="tournament in filteredTournaments" :key="tournament.id" :value="tournament">
                                     {{ tournament.name }}
                                 </ComboboxItem>
@@ -177,17 +177,17 @@ watch(
 
                     <div class="grid grid-cols-2 gap-4">
                         <div class="grid gap-2">
-                            <Label>Hosting Team</Label>
+                            <Label>Équipe domicile</Label>
                             <Combobox v-model="selectedTeam1" v-model:search-term="team1SearchTerm" :filter-function="() => true">
                                 <ComboboxAnchor>
                                     <ComboboxInput
-                                        :placeholder="selectedTeam1?.name ?? 'Search team...'"
+                                        :placeholder="selectedTeam1?.name ?? 'Rechercher une équipe...'"
                                         :display-value="(val: Team) => val?.name"
                                     />
                                     <ComboboxTrigger />
                                 </ComboboxAnchor>
                                 <ComboboxContent>
-                                    <ComboboxEmpty>No teams found.</ComboboxEmpty>
+                                    <ComboboxEmpty>Aucune équipe trouvée.</ComboboxEmpty>
                                     <ComboboxItem v-for="team in filteredTeams1" :key="team.id" :value="team">
                                         {{ team.name }}
                                     </ComboboxItem>
@@ -197,11 +197,11 @@ watch(
                         </div>
 
                         <div class="grid gap-2">
-                            <Label>Receiving Team</Label>
+                            <Label>Équipe visiteur</Label>
                             <Combobox v-model="selectedTeam2" v-model:search-term="team2SearchTerm" :filter-function="() => true">
                                 <ComboboxAnchor>
                                     <ComboboxInput
-                                        :placeholder="selectedTeam2?.name ?? 'Search team...'"
+                                        :placeholder="selectedTeam2?.name ?? 'Rechercher une équipe...'"
                                         :display-value="(val: Team) => val?.name"
                                     />
                                     <ComboboxTrigger />
@@ -218,10 +218,10 @@ watch(
                     </div>
 
                     <div class="rounded-lg border border-[#e3e3e0] p-4 dark:border-[#3E3E3A]">
-                        <h3 class="mb-4 font-semibold">Leg 1</h3>
+                        <h3 class="mb-4 font-semibold">Match aller</h3>
                         <div class="grid grid-cols-2 gap-4">
                             <div class="grid gap-2">
-                                <Label for="leg1_team1_score">{{ team1Name }} score</Label>
+                                <Label for="leg1_team1_score">Score {{ team1Name }}</Label>
                                 <Input
                                     id="leg1_team1_score"
                                     v-model="leg1Team1Score"
@@ -233,7 +233,7 @@ watch(
                                 <InputError :message="(page.props.errors as Record<string, string>)?.leg1_team1_score" />
                             </div>
                             <div class="grid gap-2">
-                                <Label for="leg1_team2_score">{{ team2Name }} score</Label>
+                                <Label for="leg1_team2_score">Score {{ team2Name }}</Label>
                                 <Input
                                     id="leg1_team2_score"
                                     v-model="leg1Team2Score"
@@ -248,10 +248,10 @@ watch(
                     </div>
 
                     <div class="rounded-lg border border-[#e3e3e0] p-4 dark:border-[#3E3E3A]">
-                        <h3 class="mb-4 font-semibold">Leg 2</h3>
+                        <h3 class="mb-4 font-semibold">Match retour</h3>
                         <div class="grid grid-cols-2 gap-4">
                             <div class="grid gap-2">
-                                <Label for="leg2_team1_score">{{ team1Name }} score</Label>
+                                <Label for="leg2_team1_score">Score {{ team1Name }}</Label>
                                 <Input
                                     id="leg2_team1_score"
                                     v-model="leg2Team1Score"
@@ -263,7 +263,7 @@ watch(
                                 <InputError :message="(page.props.errors as Record<string, string>)?.leg2_team1_score" />
                             </div>
                             <div class="grid gap-2">
-                                <Label for="leg2_team2_score">{{ team2Name }} score</Label>
+                                <Label for="leg2_team2_score">Score {{ team2Name }}</Label>
                                 <Input
                                     id="leg2_team2_score"
                                     v-model="leg2Team2Score"
@@ -278,7 +278,7 @@ watch(
                     </div>
 
                     <div class="flex justify-end">
-                        <Button type="submit">Create Game</Button>
+                        <Button type="submit">Créer le match</Button>
                     </div>
                 </form>
             </div>
