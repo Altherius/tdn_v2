@@ -2,12 +2,14 @@
 
 use App\Models\Region;
 use App\Models\Team;
+use App\Models\User;
 use Inertia\Testing\AssertableInertia;
 
 it('can render create team page', function () {
+    $user = User::factory()->create();
     Region::factory()->count(3)->create();
 
-    $response = $this->get('/teams/new');
+    $response = $this->actingAs($user)->get('/teams/new');
 
     $response->assertSuccessful();
     $response->assertInertia(fn (AssertableInertia $page) => $page
@@ -17,9 +19,10 @@ it('can render create team page', function () {
 });
 
 it('can create a team', function () {
+    $user = User::factory()->create();
     $region = Region::factory()->create();
 
-    $response = $this->post('/teams', [
+    $response = $this->actingAs($user)->post('/teams', [
         'name' => 'New Team',
         'region_id' => $region->id,
     ]);
@@ -33,13 +36,17 @@ it('can create a team', function () {
 });
 
 it('validates required fields when creating a team', function () {
-    $response = $this->post('/teams', []);
+    $user = User::factory()->create();
+
+    $response = $this->actingAs($user)->post('/teams', []);
 
     $response->assertSessionHasErrors(['name', 'region_id']);
 });
 
 it('validates region exists when creating a team', function () {
-    $response = $this->post('/teams', [
+    $user = User::factory()->create();
+
+    $response = $this->actingAs($user)->post('/teams', [
         'name' => 'New Team',
         'region_id' => 999,
     ]);
@@ -48,10 +55,11 @@ it('validates region exists when creating a team', function () {
 });
 
 it('can render edit team page', function () {
+    $user = User::factory()->create();
     $team = Team::factory()->create();
     Region::factory()->count(3)->create();
 
-    $response = $this->get("/teams/edit/{$team->id}");
+    $response = $this->actingAs($user)->get("/teams/edit/{$team->id}");
 
     $response->assertSuccessful();
     $response->assertInertia(fn (AssertableInertia $page) => $page
@@ -63,10 +71,11 @@ it('can render edit team page', function () {
 });
 
 it('can update a team', function () {
+    $user = User::factory()->create();
     $team = Team::factory()->create(['name' => 'Old Name']);
     $newRegion = Region::factory()->create();
 
-    $response = $this->put("/teams/{$team->id}", [
+    $response = $this->actingAs($user)->put("/teams/{$team->id}", [
         'name' => 'New Name',
         'region_id' => $newRegion->id,
     ]);
@@ -79,22 +88,38 @@ it('can update a team', function () {
 });
 
 it('validates required fields when updating a team', function () {
+    $user = User::factory()->create();
     $team = Team::factory()->create();
 
-    $response = $this->put("/teams/{$team->id}", []);
+    $response = $this->actingAs($user)->put("/teams/{$team->id}", []);
 
     $response->assertSessionHasErrors(['name', 'region_id']);
 });
 
 it('does not change elo rating when updating a team', function () {
+    $user = User::factory()->create();
     $team = Team::factory()->create(['elo_rating' => 1200]);
     $region = Region::factory()->create();
 
-    $this->put("/teams/{$team->id}", [
+    $this->actingAs($user)->put("/teams/{$team->id}", [
         'name' => 'Updated Name',
         'region_id' => $region->id,
     ]);
 
     $team->refresh();
     expect($team->elo_rating)->toBe(1200);
+});
+
+it('redirects guests to login when accessing team create', function () {
+    $response = $this->get('/teams/new');
+
+    $response->assertRedirect('/login');
+});
+
+it('redirects guests to login when accessing team edit', function () {
+    $team = Team::factory()->create();
+
+    $response = $this->get("/teams/edit/{$team->id}");
+
+    $response->assertRedirect('/login');
 });

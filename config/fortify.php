@@ -45,7 +45,7 @@ return [
     |
     */
 
-    'username' => 'email',
+    'username' => 'name',
 
     'email' => 'email',
 
@@ -60,7 +60,7 @@ return [
     |
     */
 
-    'lowercase_usernames' => true,
+    'lowercase_usernames' => false,
 
     /*
     |--------------------------------------------------------------------------
@@ -73,7 +73,7 @@ return [
     |
     */
 
-    'home' => '/dashboard',
+    'home' => '/',
 
     /*
     |--------------------------------------------------------------------------
@@ -144,7 +144,6 @@ return [
     */
 
     'features' => [
-        Features::registration(),
         Features::resetPasswords(),
         Features::emailVerification(),
         Features::twoFactorAuthentication([

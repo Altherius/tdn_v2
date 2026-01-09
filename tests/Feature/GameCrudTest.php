@@ -3,13 +3,15 @@
 use App\Models\Game;
 use App\Models\Team;
 use App\Models\Tournament;
+use App\Models\User;
 use Inertia\Testing\AssertableInertia;
 
 it('can render create game page', function () {
+    $user = User::factory()->create();
     Team::factory()->count(3)->create();
     Tournament::factory()->count(2)->create();
 
-    $response = $this->get('/games/new');
+    $response = $this->actingAs($user)->get('/games/new');
 
     $response->assertSuccessful();
     $response->assertInertia(fn (AssertableInertia $page) => $page
@@ -20,11 +22,12 @@ it('can render create game page', function () {
 });
 
 it('can create a game with all scores', function () {
+    $user = User::factory()->create();
     $team1 = Team::factory()->create();
     $team2 = Team::factory()->create();
     $tournament = Tournament::factory()->create();
 
-    $response = $this->post('/games', [
+    $response = $this->actingAs($user)->post('/games', [
         'tournament_id' => $tournament->id,
         'team1_id' => $team1->id,
         'team2_id' => $team2->id,
@@ -49,10 +52,11 @@ it('can create a game with all scores', function () {
 });
 
 it('can create a game without tournament', function () {
+    $user = User::factory()->create();
     $team1 = Team::factory()->create();
     $team2 = Team::factory()->create();
 
-    $response = $this->post('/games', [
+    $response = $this->actingAs($user)->post('/games', [
         'tournament_id' => null,
         'team1_id' => $team1->id,
         'team2_id' => $team2->id,
@@ -70,7 +74,9 @@ it('can create a game without tournament', function () {
 });
 
 it('validates required fields when creating a game', function () {
-    $response = $this->post('/games', []);
+    $user = User::factory()->create();
+
+    $response = $this->actingAs($user)->post('/games', []);
 
     $response->assertSessionHasErrors([
         'team1_id',
@@ -83,7 +89,9 @@ it('validates required fields when creating a game', function () {
 });
 
 it('validates teams exist when creating a game', function () {
-    $response = $this->post('/games', [
+    $user = User::factory()->create();
+
+    $response = $this->actingAs($user)->post('/games', [
         'team1_id' => 999,
         'team2_id' => 998,
         'leg1_team1_score' => 1,
@@ -96,9 +104,10 @@ it('validates teams exist when creating a game', function () {
 });
 
 it('validates teams are different when creating a game', function () {
+    $user = User::factory()->create();
     $team = Team::factory()->create();
 
-    $response = $this->post('/games', [
+    $response = $this->actingAs($user)->post('/games', [
         'team1_id' => $team->id,
         'team2_id' => $team->id,
         'leg1_team1_score' => 1,
@@ -111,10 +120,11 @@ it('validates teams are different when creating a game', function () {
 });
 
 it('validates scores are non-negative integers', function () {
+    $user = User::factory()->create();
     $team1 = Team::factory()->create();
     $team2 = Team::factory()->create();
 
-    $response = $this->post('/games', [
+    $response = $this->actingAs($user)->post('/games', [
         'team1_id' => $team1->id,
         'team2_id' => $team2->id,
         'leg1_team1_score' => -1,
@@ -127,10 +137,11 @@ it('validates scores are non-negative integers', function () {
 });
 
 it('validates tournament exists when provided', function () {
+    $user = User::factory()->create();
     $team1 = Team::factory()->create();
     $team2 = Team::factory()->create();
 
-    $response = $this->post('/games', [
+    $response = $this->actingAs($user)->post('/games', [
         'tournament_id' => 999,
         'team1_id' => $team1->id,
         'team2_id' => $team2->id,
@@ -144,13 +155,20 @@ it('validates tournament exists when provided', function () {
 });
 
 it('excludes over tournaments from create game page', function () {
+    $user = User::factory()->create();
     Tournament::factory()->count(2)->create();
     Tournament::factory()->over()->create();
 
-    $response = $this->get('/games/new');
+    $response = $this->actingAs($user)->get('/games/new');
 
     $response->assertInertia(fn (AssertableInertia $page) => $page
         ->component('Games/Create')
         ->has('tournaments', 2)
     );
+});
+
+it('redirects guests to login when accessing game create', function () {
+    $response = $this->get('/games/new');
+
+    $response->assertRedirect('/login');
 });

@@ -35,7 +35,7 @@ defineProps<{
         <main class="mx-auto w-full max-w-4xl p-6 lg:p-8">
             <div class="mb-6">
                 <h1 class="text-2xl font-bold">Tournois</h1>
-                <div class="flex gap-4">
+                <div v-if="$page.props.auth.user" class="flex gap-4">
                     <Link
                         :href="createTournament().url"
                         class="mt-2 inline-block text-sm text-[#706f6c] hover:text-[#1b1b18] dark:text-[#A1A09A] dark:hover:text-[#EDEDEC]"

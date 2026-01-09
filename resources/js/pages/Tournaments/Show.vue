@@ -101,6 +101,7 @@ function getTieResultClass(game: Game): string {
             <div class="mb-6">
                 <h1 class="text-2xl font-bold">{{ tournament.name }}</h1>
                 <Link
+                    v-if="$page.props.auth.user"
                     :href="editTournament(tournament.id).url"
                     class="mt-2 inline-block text-sm text-[#706f6c] hover:text-[#1b1b18] dark:text-[#A1A09A] dark:hover:text-[#EDEDEC]"
                 >

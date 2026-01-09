@@ -40,20 +40,22 @@ function handleLogout() {
                 >
                     Tournois
                 </Link>
-                <Link
-                    :href="createTeam().url"
-                    class="text-sm hover:text-[#1b1b18] dark:hover:text-[#EDEDEC]"
-                    :class="currentPath === createTeam().url ? 'font-medium text-[#1b1b18] dark:text-[#EDEDEC]' : 'text-[#706f6c] dark:text-[#A1A09A]'"
-                >
-                    Créer une équipe
-                </Link>
-                <Link
-                    :href="createGame().url"
-                    class="text-sm hover:text-[#1b1b18] dark:hover:text-[#EDEDEC]"
-                    :class="currentPath === createGame().url ? 'font-medium text-[#1b1b18] dark:text-[#EDEDEC]' : 'text-[#706f6c] dark:text-[#A1A09A]'"
-                >
-                    Créer un match
-                </Link>
+                <template v-if="$page.props.auth.user">
+                    <Link
+                        :href="createTeam().url"
+                        class="text-sm hover:text-[#1b1b18] dark:hover:text-[#EDEDEC]"
+                        :class="currentPath === createTeam().url ? 'font-medium text-[#1b1b18] dark:text-[#EDEDEC]' : 'text-[#706f6c] dark:text-[#A1A09A]'"
+                    >
+                        Créer une équipe
+                    </Link>
+                    <Link
+                        :href="createGame().url"
+                        class="text-sm hover:text-[#1b1b18] dark:hover:text-[#EDEDEC]"
+                        :class="currentPath === createGame().url ? 'font-medium text-[#1b1b18] dark:text-[#EDEDEC]' : 'text-[#706f6c] dark:text-[#A1A09A]'"
+                    >
+                        Créer un match
+                    </Link>
+                </template>
             </div>
 
             <div class="flex items-center gap-4">

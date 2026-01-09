@@ -210,6 +210,7 @@ const chartOptions = computed(() => {
                     {{ team.region.name }} &middot; Classement : {{ team.elo_rating }}
                 </p>
                 <Link
+                    v-if="$page.props.auth.user"
                     :href="editTeam(team.id).url"
                     class="mt-2 inline-block text-sm text-[#706f6c] hover:text-[#1b1b18] dark:text-[#A1A09A] dark:hover:text-[#EDEDEC]"
                 >

@@ -3,6 +3,7 @@
 use App\Models\Game;
 use App\Models\Team;
 use App\Models\Tournament;
+use App\Models\User;
 use Inertia\Testing\AssertableInertia;
 
 it('can create a tournament', function () {
@@ -88,9 +89,10 @@ it('can have all three different team placements', function () {
 });
 
 it('can render generate roster page', function () {
+    $user = User::factory()->create();
     Team::factory()->count(5)->create();
 
-    $response = $this->get('/tournaments/generate-roster');
+    $response = $this->actingAs($user)->get('/tournaments/generate-roster');
 
     $response->assertSuccessful();
     $response->assertInertia(fn (AssertableInertia $page) => $page
@@ -100,9 +102,10 @@ it('can render generate roster page', function () {
 });
 
 it('generate roster page includes teams with regions', function () {
+    $user = User::factory()->create();
     $team = Team::factory()->create();
 
-    $response = $this->get('/tournaments/generate-roster');
+    $response = $this->actingAs($user)->get('/tournaments/generate-roster');
 
     $response->assertSuccessful();
     $response->assertInertia(fn (AssertableInertia $page) => $page
@@ -129,9 +132,10 @@ it('index page includes is_major and is_balancing properties', function () {
 });
 
 it('can update tournament is_over property', function () {
+    $user = User::factory()->create();
     $tournament = Tournament::factory()->create(['is_over' => false]);
 
-    $response = $this->put("/tournaments/{$tournament->id}", [
+    $response = $this->actingAs($user)->put("/tournaments/{$tournament->id}", [
         'name' => $tournament->name,
         'is_over' => true,
     ]);
@@ -144,4 +148,18 @@ it('tournament is_over defaults to false', function () {
     $tournament = Tournament::factory()->create();
 
     expect($tournament->is_over)->toBeFalse();
+});
+
+it('redirects guests to login when accessing tournament create', function () {
+    $response = $this->get('/tournaments/new');
+
+    $response->assertRedirect('/login');
+});
+
+it('redirects guests to login when accessing tournament edit', function () {
+    $tournament = Tournament::factory()->create();
+
+    $response = $this->get("/tournaments/edit/{$tournament->id}");
+
+    $response->assertRedirect('/login');
 });

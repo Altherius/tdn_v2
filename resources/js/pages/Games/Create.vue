@@ -53,17 +53,17 @@ const team2SearchTerm = ref('');
 
 const filteredTournaments = computed(() => {
     if (!tournamentSearchTerm.value) return props.tournaments;
-    return props.tournaments.filter((t) => t.name.toLowerCase().includes(tournamentSearchTerm.value.toLowerCase()));
+    return props.tournaments.filter((t) => t.name.toLowerCase().startsWith(tournamentSearchTerm.value.toLowerCase()));
 });
 
 const filteredTeams1 = computed(() => {
     if (!team1SearchTerm.value) return props.teams;
-    return props.teams.filter((t) => t.name.toLowerCase().includes(team1SearchTerm.value.toLowerCase()));
+    return props.teams.filter((t) => t.name.toLowerCase().startsWith(team1SearchTerm.value.toLowerCase()));
 });
 
 const filteredTeams2 = computed(() => {
     if (!team2SearchTerm.value) return props.teams;
-    return props.teams.filter((t) => t.name.toLowerCase().includes(team2SearchTerm.value.toLowerCase()));
+    return props.teams.filter((t) => t.name.toLowerCase().startsWith(team2SearchTerm.value.toLowerCase()));
 });
 
 const team1Name = computed(() => selectedTeam1.value?.name ?? 'Domicile');
@@ -188,7 +188,7 @@ watch(
                                     <ComboboxTrigger />
                                 </ComboboxAnchor>
                                 <ComboboxContent>
-                                    <ComboboxEmpty>No teams found.</ComboboxEmpty>
+                                    <ComboboxEmpty>Aucune équipe trouvée.</ComboboxEmpty>
                                     <ComboboxItem v-for="team in filteredTeams2" :key="team.id" :value="team">
                                         {{ team.name }}
                                     </ComboboxItem>
