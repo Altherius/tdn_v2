@@ -17,6 +17,7 @@ class Tournament extends Model
         'third_place_team_id',
         'is_major',
         'is_balancing',
+        'is_over',
     ];
 
     /**
@@ -27,6 +28,7 @@ class Tournament extends Model
         return [
             'is_major' => 'boolean',
             'is_balancing' => 'boolean',
+            'is_over' => 'boolean',
         ];
     }
 

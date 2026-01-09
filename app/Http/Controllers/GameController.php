@@ -15,7 +15,7 @@ class GameController extends Controller
     public function create(): Response
     {
         return Inertia::render('Games/Create', [
-            'tournaments' => Tournament::orderBy('name')->get(),
+            'tournaments' => Tournament::where('is_over', false)->orderBy('name')->get(),
             'teams' => Team::orderBy('name')->get(),
         ]);
     }

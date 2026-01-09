@@ -31,6 +31,7 @@ class TournamentRequest extends FormRequest
             $rules['winner_team_id'] = ['nullable', 'exists:teams,id'];
             $rules['second_place_team_id'] = ['nullable', 'exists:teams,id'];
             $rules['third_place_team_id'] = ['nullable', 'exists:teams,id'];
+            $rules['is_over'] = ['boolean'];
         }
 
         return $rules;

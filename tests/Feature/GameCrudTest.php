@@ -142,3 +142,15 @@ it('validates tournament exists when provided', function () {
 
     $response->assertSessionHasErrors(['tournament_id']);
 });
+
+it('excludes over tournaments from create game page', function () {
+    Tournament::factory()->count(2)->create();
+    Tournament::factory()->over()->create();
+
+    $response = $this->get('/games/new');
+
+    $response->assertInertia(fn (AssertableInertia $page) => $page
+        ->component('Games/Create')
+        ->has('tournaments', 2)
+    );
+});

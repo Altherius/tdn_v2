@@ -127,3 +127,21 @@ it('index page includes is_major and is_balancing properties', function () {
         ->where('tournaments.0.is_balancing', true)
     );
 });
+
+it('can update tournament is_over property', function () {
+    $tournament = Tournament::factory()->create(['is_over' => false]);
+
+    $response = $this->put("/tournaments/{$tournament->id}", [
+        'name' => $tournament->name,
+        'is_over' => true,
+    ]);
+
+    $response->assertRedirect("/tournaments/{$tournament->id}");
+    expect($tournament->fresh()->is_over)->toBeTrue();
+});
+
+it('tournament is_over defaults to false', function () {
+    $tournament = Tournament::factory()->create();
+
+    expect($tournament->is_over)->toBeFalse();
+});

@@ -30,6 +30,7 @@ interface Tournament {
     name: string;
     is_major: boolean;
     is_balancing: boolean;
+    is_over: boolean;
     winner_team_id: number | null;
     second_place_team_id: number | null;
     third_place_team_id: number | null;
@@ -122,6 +123,18 @@ const filteredThirdPlaceTeams = computed(() => {
                             class="h-4 w-4 rounded border-[#e3e3e0] text-blue-600 focus:ring-blue-500 dark:border-[#3E3E3A] dark:bg-[#1a1a19]"
                         />
                         <Label for="is_balancing" class="cursor-pointer">Tournoi de rééquilibrage</Label>
+                    </div>
+
+                    <div class="flex items-center gap-3">
+                        <input
+                            id="is_over"
+                            type="checkbox"
+                            name="is_over"
+                            value="1"
+                            :checked="tournament.is_over"
+                            class="h-4 w-4 rounded border-[#e3e3e0] text-blue-600 focus:ring-blue-500 dark:border-[#3E3E3A] dark:bg-[#1a1a19]"
+                        />
+                        <Label for="is_over" class="cursor-pointer">Tournoi terminé</Label>
                     </div>
 
                     <div class="grid gap-2">

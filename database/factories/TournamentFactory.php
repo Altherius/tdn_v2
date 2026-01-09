@@ -21,6 +21,7 @@ class TournamentFactory extends Factory
             'name' => $this->faker->words(3, true).' Cup',
             'is_major' => $this->faker->boolean(30),
             'is_balancing' => $this->faker->boolean(20),
+            'is_over' => false,
         ];
     }
 
@@ -44,6 +45,13 @@ class TournamentFactory extends Factory
             'winner_team_id' => Team::factory(),
             'second_place_team_id' => Team::factory(),
             'third_place_team_id' => Team::factory(),
+        ]);
+    }
+
+    public function over(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'is_over' => true,
         ]);
     }
 }
