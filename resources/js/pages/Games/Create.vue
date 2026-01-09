@@ -75,7 +75,6 @@ const leg2Team1Score = ref<number | undefined>(undefined);
 const leg2Team2Score = ref<number | undefined>(undefined);
 
 function resetForm() {
-    selectedTournament.value = undefined;
     selectedTeam1.value = undefined;
     selectedTeam2.value = undefined;
     leg1Team1Score.value = undefined;
