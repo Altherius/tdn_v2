@@ -156,102 +156,108 @@ watch(
                         <InputError :message="(page.props.errors as Record<string, string>)?.tournament_id" />
                     </div>
 
-                    <div class="grid grid-cols-2 gap-4">
-                        <div class="grid gap-2">
-                            <Label>Équipe domicile</Label>
-                            <Combobox v-model="selectedTeam1" v-model:search-term="team1SearchTerm" :filter-function="() => true">
-                                <ComboboxAnchor>
-                                    <ComboboxInput
-                                        :placeholder="selectedTeam1?.name ?? 'Rechercher une équipe...'"
-                                        :display-value="(val: Team) => val?.name"
-                                    />
-                                    <ComboboxTrigger />
-                                </ComboboxAnchor>
-                                <ComboboxContent>
-                                    <ComboboxEmpty>Aucune équipe trouvée.</ComboboxEmpty>
-                                    <ComboboxItem v-for="team in filteredTeams1" :key="team.id" :value="team">
-                                        {{ team.name }}
-                                    </ComboboxItem>
-                                </ComboboxContent>
-                            </Combobox>
-                            <InputError :message="(page.props.errors as Record<string, string>)?.team1_id" />
-                        </div>
+                    <div class="flex flex-col gap-4">
+                        <!-- Team 1 Row (Domicile) -->
+                        <div class="flex items-end gap-4">
+                            <div class="grid flex-1 gap-2">
+                                <Label>Équipe domicile</Label>
+                                <Combobox v-model="selectedTeam1" v-model:search-term="team1SearchTerm" :filter-function="() => true">
+                                    <ComboboxAnchor>
+                                        <ComboboxInput
+                                            :placeholder="selectedTeam1?.name ?? 'Rechercher une équipe...'"
+                                            :display-value="(val: Team) => val?.name"
+                                        />
+                                        <ComboboxTrigger />
+                                    </ComboboxAnchor>
+                                    <ComboboxContent>
+                                        <ComboboxEmpty>Aucune équipe trouvée.</ComboboxEmpty>
+                                        <ComboboxItem v-for="team in filteredTeams1" :key="team.id" :value="team">
+                                            {{ team.name }}
+                                        </ComboboxItem>
+                                    </ComboboxContent>
+                                </Combobox>
+                                <InputError :message="(page.props.errors as Record<string, string>)?.team1_id" />
+                            </div>
 
-                        <div class="grid gap-2">
-                            <Label>Équipe visiteur</Label>
-                            <Combobox v-model="selectedTeam2" v-model:search-term="team2SearchTerm" :filter-function="() => true">
-                                <ComboboxAnchor>
-                                    <ComboboxInput
-                                        :placeholder="selectedTeam2?.name ?? 'Rechercher une équipe...'"
-                                        :display-value="(val: Team) => val?.name"
-                                    />
-                                    <ComboboxTrigger />
-                                </ComboboxAnchor>
-                                <ComboboxContent>
-                                    <ComboboxEmpty>Aucune équipe trouvée.</ComboboxEmpty>
-                                    <ComboboxItem v-for="team in filteredTeams2" :key="team.id" :value="team">
-                                        {{ team.name }}
-                                    </ComboboxItem>
-                                </ComboboxContent>
-                            </Combobox>
-                            <InputError :message="(page.props.errors as Record<string, string>)?.team2_id" />
-                        </div>
-                    </div>
-
-                    <div class="rounded-lg border border-[#e3e3e0] p-4 dark:border-[#3E3E3A]">
-                        <h3 class="mb-4 font-semibold">Match aller</h3>
-                        <div class="grid grid-cols-2 gap-4">
                             <div class="grid gap-2">
-                                <Label for="leg1_team1_score">Score {{ team1Name }}</Label>
+                                <Label for="leg1_team1_score">Aller</Label>
                                 <Input
                                     id="leg1_team1_score"
                                     v-model="leg1Team1Score"
                                     type="number"
                                     min="0"
+                                    max="99"
                                     required
                                     placeholder="0"
+                                    class="w-16"
                                 />
                                 <InputError :message="(page.props.errors as Record<string, string>)?.leg1_team1_score" />
                             </div>
-                            <div class="grid gap-2">
-                                <Label for="leg1_team2_score">Score {{ team2Name }}</Label>
-                                <Input
-                                    id="leg1_team2_score"
-                                    v-model="leg1Team2Score"
-                                    type="number"
-                                    min="0"
-                                    required
-                                    placeholder="0"
-                                />
-                                <InputError :message="(page.props.errors as Record<string, string>)?.leg1_team2_score" />
-                            </div>
-                        </div>
-                    </div>
 
-                    <div class="rounded-lg border border-[#e3e3e0] p-4 dark:border-[#3E3E3A]">
-                        <h3 class="mb-4 font-semibold">Match retour</h3>
-                        <div class="grid grid-cols-2 gap-4">
                             <div class="grid gap-2">
-                                <Label for="leg2_team1_score">Score {{ team1Name }}</Label>
+                                <Label for="leg2_team1_score">Retour</Label>
                                 <Input
                                     id="leg2_team1_score"
                                     v-model="leg2Team1Score"
                                     type="number"
                                     min="0"
+                                    max="99"
                                     required
                                     placeholder="0"
+                                    class="w-16"
                                 />
                                 <InputError :message="(page.props.errors as Record<string, string>)?.leg2_team1_score" />
                             </div>
+                        </div>
+
+                        <!-- Team 2 Row (Visiteur) -->
+                        <div class="flex items-end gap-4">
+                            <div class="grid flex-1 gap-2">
+                                <Label>Équipe visiteur</Label>
+                                <Combobox v-model="selectedTeam2" v-model:search-term="team2SearchTerm" :filter-function="() => true">
+                                    <ComboboxAnchor>
+                                        <ComboboxInput
+                                            :placeholder="selectedTeam2?.name ?? 'Rechercher une équipe...'"
+                                            :display-value="(val: Team) => val?.name"
+                                        />
+                                        <ComboboxTrigger />
+                                    </ComboboxAnchor>
+                                    <ComboboxContent>
+                                        <ComboboxEmpty>Aucune équipe trouvée.</ComboboxEmpty>
+                                        <ComboboxItem v-for="team in filteredTeams2" :key="team.id" :value="team">
+                                            {{ team.name }}
+                                        </ComboboxItem>
+                                    </ComboboxContent>
+                                </Combobox>
+                                <InputError :message="(page.props.errors as Record<string, string>)?.team2_id" />
+                            </div>
+
                             <div class="grid gap-2">
-                                <Label for="leg2_team2_score">Score {{ team2Name }}</Label>
+                                <Label for="leg1_team2_score">Aller</Label>
+                                <Input
+                                    id="leg1_team2_score"
+                                    v-model="leg1Team2Score"
+                                    type="number"
+                                    min="0"
+                                    max="99"
+                                    required
+                                    placeholder="0"
+                                    class="w-16"
+                                />
+                                <InputError :message="(page.props.errors as Record<string, string>)?.leg1_team2_score" />
+                            </div>
+
+                            <div class="grid gap-2">
+                                <Label for="leg2_team2_score">Retour</Label>
                                 <Input
                                     id="leg2_team2_score"
                                     v-model="leg2Team2Score"
                                     type="number"
                                     min="0"
+                                    max="99"
                                     required
                                     placeholder="0"
+                                    class="w-16"
                                 />
                                 <InputError :message="(page.props.errors as Record<string, string>)?.leg2_team2_score" />
                             </div>
