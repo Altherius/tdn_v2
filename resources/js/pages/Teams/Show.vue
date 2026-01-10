@@ -406,9 +406,9 @@ const filteredGames = computed(() => {
                         <tr class="border-b border-[#e3e3e0] bg-[#f8f8f7] dark:border-[#3E3E3A] dark:bg-[#1a1a19]">
                             <th class="px-6 py-3 text-left text-sm font-semibold">Équipes</th>
                             <th v-if="selectedTournamentId === null" class="px-6 py-3 text-left text-sm font-semibold">Tournoi</th>
+                            <th class="px-6 py-3 text-center text-sm font-semibold">Résultat</th>
                             <th class="px-6 py-3 text-center text-sm font-semibold">Aller</th>
                             <th class="px-6 py-3 text-center text-sm font-semibold">Retour</th>
-                            <th class="px-6 py-3 text-center text-sm font-semibold">Total</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -453,16 +453,16 @@ const filteredGames = computed(() => {
                                 >
                                     {{ game.tournament.name }}
                                 </Link>
-                                <span class="dark:text-[#444444]" v-else><i>Amical</i></span>
-                            </td>
-                            <td class="px-6 py-4 text-center text-sm font-mono">
-                                {{ formatLegResult(game, 1) }}
-                            </td>
-                            <td class="px-6 py-4 text-center text-sm font-mono">
-                                {{ formatLegResult(game, 2) }}
+                                <span class="dark:text-[#444444] text-[#AAA]" v-else><i>Amical</i></span>
                             </td>
                             <td class="px-6 py-4 text-center text-sm font-mono font-semibold" :class="getTieResultClass(game)">
                                 {{ formatTieResult(game) }}
+                            </td>
+                            <td class="px-6 py-4 text-center text-sm font-mono dark:text-[#444444] text-[#AAA]">
+                                {{ formatLegResult(game, 1) }}
+                            </td>
+                            <td class="px-6 py-4 text-center text-sm font-mono dark:text-[#444444] text-[#AAA]">
+                                {{ formatLegResult(game, 2) }}
                             </td>
                         </tr>
                     </tbody>
