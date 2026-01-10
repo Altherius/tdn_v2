@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::get('/', function () {
-    $teams = Team::with('region')
+    $teams = Team::with(['region', 'country'])
         ->orderByDesc('elo_rating')
         ->get()
         ->map(fn (Team $team) => [
@@ -16,6 +16,7 @@ Route::get('/', function () {
             'name' => $team->name,
             'elo_rating' => $team->elo_rating,
             'region' => $team->region,
+            'country' => $team->country,
             'lastGames' => array_map(
                 fn ($result) => $result->value,
                 $team->getLastGameResults()

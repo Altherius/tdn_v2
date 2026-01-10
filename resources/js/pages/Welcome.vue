@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import CountryFlag from '@/components/CountryFlag.vue';
 import Navbar from '@/components/Navbar.vue';
 import { show as showTeam } from '@/actions/App/Http/Controllers/TeamController';
 import { Head, Link } from '@inertiajs/vue3';
@@ -10,6 +11,12 @@ interface Region {
     name: string;
 }
 
+interface Country {
+    id: number;
+    name: string;
+    code: string;
+}
+
 type GameResult = 'win' | 'draw' | 'loss';
 
 interface Team {
@@ -17,6 +24,7 @@ interface Team {
     name: string;
     elo_rating: number;
     region: Region;
+    country: Country | null;
     lastGames: GameResult[];
 }
 
@@ -47,6 +55,15 @@ function toggleSort(column: SortColumn) {
         sortDirection.value = 'asc';
     }
 }
+
+// Compute original ranking based on ELO (teams come sorted by ELO from backend)
+const teamRanks = computed(() => {
+    const ranks = new Map<number, number>();
+    props.teams.forEach((team, index) => {
+        ranks.set(team.id, index + 1);
+    });
+    return ranks;
+});
 
 const filteredAndSortedTeams = computed(() => {
     let result = [...props.teams];
@@ -106,6 +123,7 @@ const filteredAndSortedTeams = computed(() => {
                 <table class="w-full">
                     <thead>
                         <tr class="border-b border-[#e3e3e0] bg-[#f8f8f7] dark:border-[#3E3E3A] dark:bg-[#1a1a19]">
+                            <th class="px-4 py-3 text-center text-sm font-semibold w-12">#</th>
                             <th class="px-6 py-3 text-left text-sm font-semibold">
                                 <button
                                     @click="toggleSort('name')"
@@ -144,7 +162,7 @@ const filteredAndSortedTeams = computed(() => {
                     </thead>
                     <tbody>
                         <tr v-if="filteredAndSortedTeams.length === 0">
-                            <td colspan="4" class="px-6 py-8 text-center text-[#706f6c] dark:text-[#A1A09A]">
+                            <td colspan="5" class="px-6 py-8 text-center text-[#706f6c] dark:text-[#A1A09A]">
                                 Aucune équipe trouvée.
                             </td>
                         </tr>
@@ -153,13 +171,19 @@ const filteredAndSortedTeams = computed(() => {
                             :key="team.id"
                             class="border-b border-[#e3e3e0] last:border-b-0 dark:border-[#3E3E3A]"
                         >
+                            <td class="px-4 py-4 text-center text-sm font-mono text-[#706f6c] dark:text-[#A1A09A]">
+                                {{ teamRanks.get(team.id) }}
+                            </td>
                             <td class="px-6 py-4 text-sm font-medium">
-                                <Link
-                                    :href="showTeam(team.id).url"
-                                    class="hover:underline"
-                                >
-                                    {{ team.name }}
-                                </Link>
+                                <div class="flex items-center gap-2">
+                                    <CountryFlag v-if="team.country" :code="team.country.code" />
+                                    <Link
+                                        :href="showTeam(team.id).url"
+                                        class="hover:underline"
+                                    >
+                                        {{ team.name }}
+                                    </Link>
+                                </div>
                             </td>
                             <td class="px-6 py-4 text-sm text-[#706f6c] dark:text-[#A1A09A]">{{ team.region.name }}</td>
                             <td class="px-6 py-4 text-right text-sm font-mono">{{ team.elo_rating }}</td>

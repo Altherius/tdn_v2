@@ -18,8 +18,8 @@ interface Tournament {
     is_major: boolean;
     is_balancing: boolean;
     winner: Team | null;
-    secondPlace: Team | null;
-    thirdPlace: Team | null;
+    second_place: Team | null;
+    third_place: Team | null;
 }
 
 defineProps<{
@@ -98,21 +98,21 @@ defineProps<{
                             </td>
                             <td class="px-6 py-4 text-sm">
                                 <Link
-                                    v-if="tournament.secondPlace"
-                                    :href="showTeam(tournament.secondPlace.id).url"
+                                    v-if="tournament.second_place"
+                                    :href="showTeam(tournament.second_place.id).url"
                                     class="hover:underline"
                                 >
-                                    {{ tournament.secondPlace.name }}
+                                    {{ tournament.second_place.name }}
                                 </Link>
                                 <span v-else class="text-[#706f6c] dark:text-[#A1A09A]">-</span>
                             </td>
                             <td class="px-6 py-4 text-sm">
                                 <Link
-                                    v-if="tournament.thirdPlace"
-                                    :href="showTeam(tournament.thirdPlace.id).url"
+                                    v-if="tournament.third_place"
+                                    :href="showTeam(tournament.third_place.id).url"
                                     class="hover:underline"
                                 >
-                                    {{ tournament.thirdPlace.name }}
+                                    {{ tournament.third_place.name }}
                                 </Link>
                                 <span v-else class="text-[#706f6c] dark:text-[#A1A09A]">-</span>
                             </td>

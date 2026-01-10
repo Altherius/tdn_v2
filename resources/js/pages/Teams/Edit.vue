@@ -25,16 +25,25 @@ interface Region {
     name: string;
 }
 
+interface Country {
+    id: number;
+    name: string;
+    code: string;
+}
+
 interface Team {
     id: number;
     name: string;
     region_id: number;
+    country_id: number | null;
+    country: Country | null;
     elo_rating: number;
 }
 
 const props = defineProps<{
     team: Team;
     regions: Region[];
+    countries: Country[];
 }>();
 
 const { resolvedAppearance, updateAppearance } = useAppearance();
@@ -49,6 +58,14 @@ const searchTerm = ref('');
 const filteredRegions = computed(() => {
     if (!searchTerm.value) return props.regions;
     return props.regions.filter((region) => region.name.toLowerCase().includes(searchTerm.value.toLowerCase()));
+});
+
+const selectedCountry = ref<Country | undefined>(props.team.country ?? undefined);
+const countrySearchTerm = ref('');
+
+const filteredCountries = computed(() => {
+    if (!countrySearchTerm.value) return props.countries;
+    return props.countries.filter((country) => country.name.toLowerCase().includes(countrySearchTerm.value.toLowerCase()));
 });
 </script>
 
@@ -97,6 +114,24 @@ const filteredRegions = computed(() => {
                             </ComboboxContent>
                         </Combobox>
                         <InputError :message="errors.region_id" />
+                    </div>
+
+                    <div class="grid gap-2">
+                        <Label>Pays</Label>
+                        <input type="hidden" name="country_id" :value="selectedCountry?.id ?? ''" />
+                        <Combobox v-model="selectedCountry" v-model:search-term="countrySearchTerm" :filter-function="() => true">
+                            <ComboboxAnchor>
+                                <ComboboxInput :placeholder="selectedCountry?.name ?? 'Rechercher un pays...'" :display-value="(val: Country) => val?.name" />
+                                <ComboboxTrigger />
+                            </ComboboxAnchor>
+                            <ComboboxContent>
+                                <ComboboxEmpty>Aucun pays trouvé.</ComboboxEmpty>
+                                <ComboboxItem v-for="country in filteredCountries" :key="country.id" :value="country">
+                                    {{ country.name }}
+                                </ComboboxItem>
+                            </ComboboxContent>
+                        </Combobox>
+                        <InputError :message="errors.country_id" />
                     </div>
 
                     <div class="flex justify-end">

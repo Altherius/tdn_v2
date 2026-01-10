@@ -5,6 +5,7 @@ import { useAppearance } from '@/composables/useAppearance';
 import { home } from '@/routes';
 import { Head, Link } from '@inertiajs/vue3';
 import {
+    ArcElement,
     CategoryScale,
     Chart as ChartJS,
     Legend,
@@ -15,16 +16,16 @@ import {
     Tooltip,
 } from 'chart.js';
 import { Moon, Sun } from 'lucide-vue-next';
-import { computed } from 'vue';
-import { Line } from 'vue-chartjs';
+import { computed, ref } from 'vue';
+import { Line, Pie } from 'vue-chartjs';
 import Navbar from '@/components/Navbar.vue';
 import Breadcrumb from '@/components/Breadcrumb.vue';
 const breadcrumbs: BreadcrumbItem[] = [
-    { label: 'Classement', href: indexTournaments().url },
+    { label: 'Classement', href: home().url },
     { label: 'Détail' },
 ];
 
-ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
+ChartJS.register(ArcElement, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
 interface Region {
     id: number;
@@ -195,6 +196,135 @@ const chartOptions = computed(() => {
         },
     };
 });
+
+const gameStats = computed(() => {
+    let wins = 0;
+    let draws = 0;
+    let losses = 0;
+
+    for (const game of props.games) {
+        if (
+            game.leg1_team1_score === null ||
+            game.leg1_team2_score === null ||
+            game.leg2_team1_score === null ||
+            game.leg2_team2_score === null
+        ) {
+            continue;
+        }
+
+        const team1Total = game.leg1_team1_score + game.leg2_team1_score;
+        const team2Total = game.leg1_team2_score + game.leg2_team2_score;
+        const isTeam1 = props.team.id === game.team1_id;
+        const teamTotal = isTeam1 ? team1Total : team2Total;
+        const opponentTotal = isTeam1 ? team2Total : team1Total;
+
+        if (teamTotal > opponentTotal) {
+            wins++;
+        } else if (teamTotal < opponentTotal) {
+            losses++;
+        } else {
+            draws++;
+        }
+    }
+
+    return { wins, draws, losses };
+});
+
+const goalStats = computed(() => {
+    let scored = 0;
+    let received = 0;
+
+    for (const game of props.games) {
+        if (
+            game.leg1_team1_score === null ||
+            game.leg1_team2_score === null ||
+            game.leg2_team1_score === null ||
+            game.leg2_team2_score === null
+        ) {
+            continue;
+        }
+
+        const team1Total = game.leg1_team1_score + game.leg2_team1_score;
+        const team2Total = game.leg1_team2_score + game.leg2_team2_score;
+        const isTeam1 = props.team.id === game.team1_id;
+
+        if (isTeam1) {
+            scored += team1Total;
+            received += team2Total;
+        } else {
+            scored += team2Total;
+            received += team1Total;
+        }
+    }
+
+    return { scored, received };
+});
+
+const resultsChartData = computed(() => {
+    return {
+        labels: ['Victoires', 'Nuls', 'Défaites'],
+        datasets: [
+            {
+                data: [gameStats.value.wins, gameStats.value.draws, gameStats.value.losses],
+                backgroundColor: ['#22c55e', '#eab308', '#ef4444'],
+                borderColor: resolvedAppearance.value === 'dark' ? '#161615' : '#ffffff',
+                borderWidth: 2,
+            },
+        ],
+    };
+});
+
+const goalsChartData = computed(() => {
+    return {
+        labels: ['Buts marqués', 'Buts encaissés'],
+        datasets: [
+            {
+                data: [goalStats.value.scored, goalStats.value.received],
+                backgroundColor: ['#3b82f6', '#f97316'],
+                borderColor: resolvedAppearance.value === 'dark' ? '#161615' : '#ffffff',
+                borderWidth: 2,
+            },
+        ],
+    };
+});
+
+const pieChartOptions = computed(() => {
+    const isDark = resolvedAppearance.value === 'dark';
+    const textColor = isDark ? '#A1A09A' : '#706f6c';
+
+    return {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: 'bottom' as const,
+                labels: {
+                    color: textColor,
+                    padding: 16,
+                },
+            },
+        },
+    };
+});
+
+const selectedTournamentId = ref<number | null>(null);
+
+const tournaments = computed(() => {
+    const tournamentMap = new Map<number, Tournament>();
+    for (const game of props.games) {
+        if (game.tournament && !tournamentMap.has(game.tournament.id)) {
+            tournamentMap.set(game.tournament.id, game.tournament);
+        }
+    }
+    return Array.from(tournamentMap.values());
+});
+
+const filteredGames = computed(() => {
+    if (selectedTournamentId.value === null) {
+        return props.games;
+    }
+    return props.games.filter((game) => game.tournament?.id === selectedTournamentId.value);
+});
 </script>
 
 <template>
@@ -226,27 +356,69 @@ const chartOptions = computed(() => {
                 </div>
             </div>
 
+            <div class="mb-8 grid gap-6 md:grid-cols-2">
+                <div
+                    class="overflow-hidden rounded-lg border border-[#e3e3e0] bg-white p-6 shadow-sm dark:border-[#3E3E3A] dark:bg-[#161615]"
+                >
+                    <h3 class="mb-4 text-center text-sm font-semibold">Résultats</h3>
+                    <div class="h-48">
+                        <Pie :data="resultsChartData" :options="pieChartOptions" />
+                    </div>
+                </div>
+                <div
+                    class="overflow-hidden rounded-lg border border-[#e3e3e0] bg-white p-6 shadow-sm dark:border-[#3E3E3A] dark:bg-[#161615]"
+                >
+                    <h3 class="mb-4 text-center text-sm font-semibold">Buts</h3>
+                    <div class="h-48">
+                        <Pie :data="goalsChartData" :options="pieChartOptions" />
+                    </div>
+                </div>
+            </div>
+
             <h2 class="mb-4 text-lg font-semibold">Historique des matchs</h2>
+
+            <div v-if="tournaments.length > 0" class="mb-4 flex flex-wrap gap-2">
+                <button
+                    v-for="tournament in tournaments"
+                    :key="tournament.id"
+                    @click="selectedTournamentId = tournament.id"
+                    class="rounded-lg border px-3 py-1.5 text-sm transition-colors"
+                    :class="
+                        selectedTournamentId === tournament.id
+                            ? 'border-[#1b1b18] bg-[#1b1b18] text-white dark:border-[#EDEDEC] dark:bg-[#EDEDEC] dark:text-[#1b1b18]'
+                            : 'border-[#e3e3e0] bg-white hover:border-[#1b1b18] dark:border-[#3E3E3A] dark:bg-[#161615] dark:hover:border-[#EDEDEC]'
+                    "
+                >
+                    {{ tournament.name }}
+                </button>
+                <button
+                    v-if="selectedTournamentId !== null"
+                    @click="selectedTournamentId = null"
+                    class="rounded-lg border border-[#e3e3e0] bg-white px-3 py-1.5 text-sm text-[#706f6c] transition-colors hover:border-[#1b1b18] hover:text-[#1b1b18] dark:border-[#3E3E3A] dark:bg-[#161615] dark:text-[#A1A09A] dark:hover:border-[#EDEDEC] dark:hover:text-[#EDEDEC]"
+                >
+                    Tous les matchs
+                </button>
+            </div>
 
             <div class="overflow-hidden rounded-lg border border-[#e3e3e0] bg-white shadow-sm dark:border-[#3E3E3A] dark:bg-[#161615]">
                 <table class="w-full">
                     <thead>
                         <tr class="border-b border-[#e3e3e0] bg-[#f8f8f7] dark:border-[#3E3E3A] dark:bg-[#1a1a19]">
                             <th class="px-6 py-3 text-left text-sm font-semibold">Équipes</th>
-                            <th class="px-6 py-3 text-left text-sm font-semibold">Tournoi</th>
+                            <th v-if="selectedTournamentId === null" class="px-6 py-3 text-left text-sm font-semibold">Tournoi</th>
                             <th class="px-6 py-3 text-center text-sm font-semibold">Aller</th>
                             <th class="px-6 py-3 text-center text-sm font-semibold">Retour</th>
                             <th class="px-6 py-3 text-center text-sm font-semibold">Total</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr v-if="games.length === 0">
-                            <td colspan="5" class="px-6 py-8 text-center text-[#706f6c] dark:text-[#A1A09A]">
+                        <tr v-if="filteredGames.length === 0">
+                            <td :colspan="selectedTournamentId === null ? 5 : 4" class="px-6 py-8 text-center text-[#706f6c] dark:text-[#A1A09A]">
                                 Aucun match joué.
                             </td>
                         </tr>
                         <tr
-                            v-for="game in games"
+                            v-for="game in filteredGames"
                             :key="game.id"
                             class="border-b border-[#e3e3e0] last:border-b-0 dark:border-[#3E3E3A]"
                         >
@@ -273,7 +445,7 @@ const chartOptions = computed(() => {
                                     {{ game.team2.name }}
                                 </Link>
                             </td>
-                            <td class="px-6 py-4 text-sm text-[#706f6c] dark:text-[#A1A09A]">
+                            <td v-if="selectedTournamentId === null" class="px-6 py-4 text-sm text-[#706f6c] dark:text-[#A1A09A]">
                                 <Link
                                     v-if="game.tournament"
                                     :href="showTournament(game.tournament.id).url"

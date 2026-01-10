@@ -15,8 +15,8 @@ interface Tournament {
     id: number;
     name: string;
     winner: Team | null;
-    secondPlace: Team | null;
-    thirdPlace: Team | null;
+    second_place: Team | null;
+    third_place: Team | null;
 }
 
 interface Game {
@@ -125,11 +125,11 @@ function getTieResultClass(game: Game): string {
                 <div class="rounded-lg border border-[#e3e3e0] bg-white p-6 shadow-sm dark:border-[#3E3E3A] dark:bg-[#161615]">
                     <p class="mb-2 text-sm font-medium text-[#706f6c] dark:text-[#A1A09A]">Deuxième</p>
                     <Link
-                        v-if="tournament.secondPlace"
-                        :href="showTeam(tournament.secondPlace.id).url"
+                        v-if="tournament.second_place"
+                        :href="showTeam(tournament.second_place.id).url"
                         class="text-lg font-semibold hover:underline"
                     >
-                        {{ tournament.secondPlace.name }}
+                        {{ tournament.second_place.name }}
                     </Link>
                     <p v-else class="text-lg text-[#706f6c] dark:text-[#A1A09A]">-</p>
                 </div>
@@ -137,11 +137,11 @@ function getTieResultClass(game: Game): string {
                 <div class="rounded-lg border border-[#e3e3e0] bg-white p-6 shadow-sm dark:border-[#3E3E3A] dark:bg-[#161615]">
                     <p class="mb-2 text-sm font-medium text-[#706f6c] dark:text-[#A1A09A]">Troisième</p>
                     <Link
-                        v-if="tournament.thirdPlace"
-                        :href="showTeam(tournament.thirdPlace.id).url"
+                        v-if="tournament.third_place"
+                        :href="showTeam(tournament.third_place.id).url"
                         class="text-lg font-semibold hover:underline"
                     >
-                        {{ tournament.thirdPlace.name }}
+                        {{ tournament.third_place.name }}
                     </Link>
                     <p v-else class="text-lg text-[#706f6c] dark:text-[#A1A09A]">-</p>
                 </div>

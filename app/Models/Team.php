@@ -14,6 +14,7 @@ class Team extends Model
     protected $fillable = [
         'name',
         'region_id',
+        'country_id',
         'elo_rating',
     ];
 
@@ -23,6 +24,14 @@ class Team extends Model
     public function region(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Region::class);
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\Country, $this>
+     */
+    public function country(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(Country::class);
     }
 
     /**

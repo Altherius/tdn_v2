@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\TeamRequest;
+use App\Models\Country;
 use App\Models\Region;
 use App\Models\Team;
 use Illuminate\Http\RedirectResponse;
@@ -15,6 +16,7 @@ class TeamController extends Controller
     {
         return Inertia::render('Teams/Create', [
             'regions' => Region::orderBy('name')->get(),
+            'countries' => Country::orderBy('name')->get(),
         ]);
     }
 
@@ -28,7 +30,7 @@ class TeamController extends Controller
     public function show(Team $team): Response
     {
         return Inertia::render('Teams/Show', [
-            'team' => $team->load('region'),
+            'team' => $team->load(['region', 'country']),
             'games' => $team->games()->with(['team1', 'team2', 'tournament'])->orderByDesc('created_at')->get(),
             'eloHistory' => $team->eloHistory()->orderBy('created_at')->get(),
         ]);
@@ -37,8 +39,9 @@ class TeamController extends Controller
     public function edit(Team $team): Response
     {
         return Inertia::render('Teams/Edit', [
-            'team' => $team,
+            'team' => $team->load('country'),
             'regions' => Region::orderBy('name')->get(),
+            'countries' => Country::orderBy('name')->get(),
         ]);
     }
 

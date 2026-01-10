@@ -24,6 +24,7 @@ class TeamRequest extends FormRequest
         return [
             'name' => ['required', 'string', 'max:255'],
             'region_id' => ['required', 'exists:regions,id'],
+            'country_id' => ['nullable', 'exists:countries,id'],
         ];
     }
 }
