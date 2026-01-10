@@ -144,6 +144,39 @@ it('can update tournament is_over property', function () {
     expect($tournament->fresh()->is_over)->toBeTrue();
 });
 
+it('can uncheck tournament is_over property when field is absent', function () {
+    $user = User::factory()->create();
+    $tournament = Tournament::factory()->create(['is_over' => true]);
+
+    $response = $this->actingAs($user)->put("/tournaments/{$tournament->id}", [
+        'name' => $tournament->name,
+        // is_over intentionally absent - simulates unchecked checkbox
+    ]);
+
+    $response->assertRedirect("/tournaments/{$tournament->id}");
+    expect($tournament->fresh()->is_over)->toBeFalse();
+});
+
+it('can uncheck boolean fields when absent from request', function () {
+    $user = User::factory()->create();
+    $tournament = Tournament::factory()->create([
+        'is_major' => true,
+        'is_balancing' => true,
+        'is_over' => true,
+    ]);
+
+    $response = $this->actingAs($user)->put("/tournaments/{$tournament->id}", [
+        'name' => $tournament->name,
+        // All checkboxes intentionally absent - simulates all unchecked
+    ]);
+
+    $response->assertRedirect("/tournaments/{$tournament->id}");
+    $fresh = $tournament->fresh();
+    expect($fresh->is_major)->toBeFalse();
+    expect($fresh->is_balancing)->toBeFalse();
+    expect($fresh->is_over)->toBeFalse();
+});
+
 it('tournament is_over defaults to false', function () {
     $tournament = Tournament::factory()->create();
 

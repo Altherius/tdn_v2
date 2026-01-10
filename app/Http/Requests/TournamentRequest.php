@@ -15,6 +15,24 @@ class TournamentRequest extends FormRequest
     }
 
     /**
+     * Prepare the data for validation.
+     */
+    protected function prepareForValidation(): void
+    {
+        $booleanFields = ['is_major', 'is_balancing'];
+
+        if ($this->isMethod('PUT') || $this->isMethod('PATCH')) {
+            $booleanFields[] = 'is_over';
+        }
+
+        foreach ($booleanFields as $field) {
+            if (! $this->has($field)) {
+                $this->merge([$field => false]);
+            }
+        }
+    }
+
+    /**
      * Get the validation rules that apply to the request.
      *
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
