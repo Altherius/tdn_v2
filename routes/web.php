@@ -8,35 +8,7 @@ use App\Models\Team;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-Route::get('/', function () {
-    $teams = Team::with(['region', 'country'])
-        ->withCount([
-            'tournamentsWon' => fn ($query) => $query->where('is_major', true),
-            'tournamentsSecondPlace' => fn ($query) => $query->where('is_major', true),
-            'tournamentsThirdPlace' => fn ($query) => $query->where('is_major', true),
-        ])
-        ->orderByDesc('elo_rating')
-        ->get()
-        ->map(fn (Team $team) => [
-            'id' => $team->id,
-            'name' => $team->name,
-            'elo_rating' => $team->elo_rating,
-            'region' => $team->region,
-            'country' => $team->country,
-            'lastGames' => array_map(
-                fn ($result) => $result->value,
-                $team->getLastGameResults()
-            ),
-            'goldCount' => $team->tournaments_won_count,
-            'silverCount' => $team->tournaments_second_place_count,
-            'bronzeCount' => $team->tournaments_third_place_count,
-        ]);
-
-    return Inertia::render('Welcome', [
-        'teams' => $teams,
-    ]);
-})->name('home');
-
+Route::get('/', [TeamController::class, 'index'])->name('home');
 Route::get('tournaments', [TournamentController::class, 'index'])->name('tournaments.index');
 
 Route::middleware('auth')->group(function () {

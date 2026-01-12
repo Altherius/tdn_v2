@@ -12,6 +12,36 @@ use Inertia\Response;
 
 class TeamController extends Controller
 {
+    public function index(): Response
+    {
+        $teams = Team::with(['region', 'country'])
+            ->withCount([
+                'tournamentsWon' => fn ($query) => $query->where('is_major', true),
+                'tournamentsSecondPlace' => fn ($query) => $query->where('is_major', true),
+                'tournamentsThirdPlace' => fn ($query) => $query->where('is_major', true),
+            ])
+            ->orderByDesc('elo_rating')
+            ->get()
+            ->map(fn (Team $team) => [
+                'id' => $team->id,
+                'name' => $team->name,
+                'elo_rating' => $team->elo_rating,
+                'region' => $team->region,
+                'country' => $team->country,
+                'lastGames' => array_map(
+                    fn ($result) => $result->value,
+                    $team->getLastGameResults()
+                ),
+                'goldCount' => $team->tournaments_won_count,
+                'silverCount' => $team->tournaments_second_place_count,
+                'bronzeCount' => $team->tournaments_third_place_count,
+            ]);
+
+        return Inertia::render('Welcome', [
+            'teams' => $teams,
+        ]);
+    }
+
     public function create(): Response
     {
         return Inertia::render('Teams/Create', [
