@@ -10,7 +10,11 @@ use Inertia\Inertia;
 
 Route::get('/', function () {
     $teams = Team::with(['region', 'country'])
-        ->withCount(['tournamentsWon', 'tournamentsSecondPlace', 'tournamentsThirdPlace'])
+        ->withCount([
+            'tournamentsWon' => fn ($query) => $query->where('is_major', true),
+            'tournamentsSecondPlace' => fn ($query) => $query->where('is_major', true),
+            'tournamentsThirdPlace' => fn ($query) => $query->where('is_major', true),
+        ])
         ->orderByDesc('elo_rating')
         ->get()
         ->map(fn (Team $team) => [
