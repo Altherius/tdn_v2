@@ -264,15 +264,15 @@ const hasCompletedGames = computed(() => {
                 <h3 class="mb-4 text-center font-semibold">Probabilités</h3>
                 <div class="flex items-center justify-center gap-8 text-center">
                     <div>
-                        <div class="text-2xl font-bold text-green-600 dark:text-green-400">{{ analysis.team1WinProbability }}%</div>
+                        <div class="text-2xl font-bold">{{ analysis.team1WinProbability }}%</div>
                         <div class="text-sm text-[#706f6c] dark:text-[#A1A09A]">{{ team1.name }}</div>
                     </div>
                     <div>
-                        <div class="text-2xl font-bold text-yellow-600 dark:text-yellow-400">{{ analysis.drawProbability }}%</div>
+                        <div class="text-2xl font-bold">{{ analysis.drawProbability }}%</div>
                         <div class="text-sm text-[#706f6c] dark:text-[#A1A09A]">Nul</div>
                     </div>
                     <div>
-                        <div class="text-2xl font-bold text-red-600 dark:text-red-400">{{ analysis.team2WinProbability }}%</div>
+                        <div class="text-2xl font-bold">{{ analysis.team2WinProbability }}%</div>
                         <div class="text-sm text-[#706f6c] dark:text-[#A1A09A]">{{ team2.name }}</div>
                     </div>
                 </div>
