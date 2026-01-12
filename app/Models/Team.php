@@ -54,6 +54,30 @@ class Team extends Model
     }
 
     /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Tournament, $this>
+     */
+    public function tournamentsWon(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Tournament::class, 'winner_team_id');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Tournament, $this>
+     */
+    public function tournamentsSecondPlace(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Tournament::class, 'second_place_team_id');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Tournament, $this>
+     */
+    public function tournamentsThirdPlace(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Tournament::class, 'third_place_team_id');
+    }
+
+    /**
      * Get the results of the last N completed games for this team.
      *
      * @return array<\App\Enums\GameResult>

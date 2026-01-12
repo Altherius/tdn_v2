@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\GameController;
+use App\Http\Controllers\MatchupController;
 use App\Http\Controllers\TeamController;
 use App\Http\Controllers\TournamentController;
 use App\Models\Team;
@@ -9,6 +10,7 @@ use Inertia\Inertia;
 
 Route::get('/', function () {
     $teams = Team::with(['region', 'country'])
+        ->withCount(['tournamentsWon', 'tournamentsSecondPlace', 'tournamentsThirdPlace'])
         ->orderByDesc('elo_rating')
         ->get()
         ->map(fn (Team $team) => [
@@ -21,6 +23,9 @@ Route::get('/', function () {
                 fn ($result) => $result->value,
                 $team->getLastGameResults()
             ),
+            'goldCount' => $team->tournaments_won_count,
+            'silverCount' => $team->tournaments_second_place_count,
+            'bronzeCount' => $team->tournaments_third_place_count,
         ]);
 
     return Inertia::render('Welcome', [
@@ -48,5 +53,8 @@ Route::middleware('auth')->group(function () {
 
 Route::get('tournaments/{tournament}', [TournamentController::class, 'show'])->name('tournaments.show');
 Route::get('teams/{team}', [TeamController::class, 'show'])->name('teams.show');
+
+Route::get('matchup', [MatchupController::class, 'index'])->name('matchup.index');
+Route::get('matchup/{team1}/{team2}', [MatchupController::class, 'show'])->name('matchup.show');
 
 require __DIR__.'/settings.php';

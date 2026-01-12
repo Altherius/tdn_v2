@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { create as createGame } from '@/actions/App/Http/Controllers/GameController';
+import { index as indexMatchup } from '@/actions/App/Http/Controllers/MatchupController';
 import { create as createTeam } from '@/actions/App/Http/Controllers/TeamController';
 import { index as indexTournaments } from '@/actions/App/Http/Controllers/TournamentController';
 import { useAppearance } from '@/composables/useAppearance';
@@ -39,6 +40,13 @@ function handleLogout() {
                     :class="currentPath === indexTournaments().url ? 'font-medium text-[#1b1b18] dark:text-[#EDEDEC]' : 'text-[#706f6c] dark:text-[#A1A09A]'"
                 >
                     Tournois
+                </Link>
+                <Link
+                    :href="indexMatchup().url"
+                    class="text-sm hover:text-[#1b1b18] dark:hover:text-[#EDEDEC]"
+                    :class="currentPath.startsWith('/matchup') ? 'font-medium text-[#1b1b18] dark:text-[#EDEDEC]' : 'text-[#706f6c] dark:text-[#A1A09A]'"
+                >
+                    Confrontation
                 </Link>
                 <template v-if="$page.props.auth.user">
                     <Link

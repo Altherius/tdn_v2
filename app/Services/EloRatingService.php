@@ -27,11 +27,50 @@ class EloRatingService
      * Calculate the expected score using the Elo formula.
      * E = 1 / (1 + 10^((opponent_rating - team_rating) / 400))
      */
-    private function calculateExpectedScore(int $teamRating, int $opponentRating): float
+    public function calculateExpectedScore(int $teamRating, int $opponentRating): float
     {
         $exponent = ($opponentRating - $teamRating) / self::RATING_DIVISOR;
 
         return 1 / (1 + pow(10, $exponent));
+    }
+
+    public function calculateOdds(int $teamRating, int $awayRating): array
+    {
+        $baseDraw = 0.22;
+        $drawDecay = 350;
+
+        $expectedResult = 1 / (1 + pow(10, ($awayRating - $teamRating) / self::RATING_DIVISOR));
+        $ratingDiff = abs($teamRating - $awayRating);
+        $drawProbability = $baseDraw * exp(-$ratingDiff / $drawDecay);
+
+        $homeWinProbability = $expectedResult - 0.5 * $drawProbability;
+        $awayWinProbability = 1 - $homeWinProbability - $drawProbability;
+
+        return [
+            'home' => $homeWinProbability,
+            'draw' => $drawProbability,
+            'away' => $awayWinProbability
+        ];
+    }
+
+    /**
+     * Calculate expected ELO change for a win scenario.
+     */
+    public function calculateExpectedGainOnWin(int $teamRating, int $opponentRating): int
+    {
+        $expectedScore = $this->calculateExpectedScore($teamRating, $opponentRating);
+
+        return (int) round(self::K_FACTOR * (1.0 - $expectedScore));
+    }
+
+    /**
+     * Calculate expected ELO change for a loss scenario.
+     */
+    public function calculateExpectedLossOnLoss(int $teamRating, int $opponentRating): int
+    {
+        $expectedScore = $this->calculateExpectedScore($teamRating, $opponentRating);
+
+        return (int) round(self::K_FACTOR * (0.0 - $expectedScore));
     }
 
     /**

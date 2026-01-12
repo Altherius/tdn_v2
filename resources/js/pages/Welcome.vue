@@ -26,6 +26,9 @@ interface Team {
     region: Region;
     country: Country | null;
     lastGames: GameResult[];
+    goldCount: number;
+    silverCount: number;
+    bronzeCount: number;
 }
 
 type SortColumn = 'name' | 'region' | 'elo_rating';
@@ -183,6 +186,11 @@ const filteredAndSortedTeams = computed(() => {
                                     >
                                         {{ team.name }}
                                     </Link>
+                                    <span v-if="team.goldCount > 0 || team.silverCount > 0 || team.bronzeCount > 0" class="flex items-center gap-1.5 text-xs">
+                                        <span v-if="team.goldCount > 0" class="text-amber-500" title="Victoires">🥇{{ team.goldCount }}</span>
+                                        <span v-if="team.silverCount > 0" class="text-slate-400" title="Deuxièmes places">🥈{{ team.silverCount }}</span>
+                                        <span v-if="team.bronzeCount > 0" class="text-amber-700" title="Troisièmes places">🥉{{ team.bronzeCount }}</span>
+                                    </span>
                                 </div>
                             </td>
                             <td class="px-6 py-4 text-sm text-[#706f6c] dark:text-[#A1A09A]">{{ team.region.name }}</td>
