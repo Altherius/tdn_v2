@@ -1,6 +1,15 @@
 <script setup lang="ts">
 import { edit as editTeam, show as showTeam } from '@/actions/App/Http/Controllers/TeamController';
-import { index as indexTournaments, show as showTournament } from '@/actions/App/Http/Controllers/TournamentController';
+import { show as showTournament } from '@/actions/App/Http/Controllers/TournamentController';
+import {
+    Combobox,
+    ComboboxAnchor,
+    ComboboxContent,
+    ComboboxEmpty,
+    ComboboxInput,
+    ComboboxItem,
+    ComboboxTrigger,
+} from '@/components/ui/combobox';
 import { useAppearance } from '@/composables/useAppearance';
 import { home } from '@/routes';
 import { Head, Link } from '@inertiajs/vue3';
@@ -307,7 +316,8 @@ const pieChartOptions = computed(() => {
     };
 });
 
-const selectedTournamentId = ref<number | null>(null);
+const selectedTournament = ref<Tournament | undefined>(undefined);
+const tournamentSearchTerm = ref('');
 
 const tournaments = computed(() => {
     const tournamentMap = new Map<number, Tournament>();
@@ -319,11 +329,16 @@ const tournaments = computed(() => {
     return Array.from(tournamentMap.values());
 });
 
+const filteredTournaments = computed(() => {
+    if (!tournamentSearchTerm.value) return tournaments.value;
+    return tournaments.value.filter((t) => t.name.toLowerCase().includes(tournamentSearchTerm.value.toLowerCase()));
+});
+
 const filteredGames = computed(() => {
-    if (selectedTournamentId.value === null) {
+    if (selectedTournament.value === undefined) {
         return props.games;
     }
-    return props.games.filter((game) => game.tournament?.id === selectedTournamentId.value);
+    return props.games.filter((game) => game.tournament?.id === selectedTournament.value?.id);
 });
 </script>
 
@@ -375,29 +390,33 @@ const filteredGames = computed(() => {
                 </div>
             </div>
 
-            <h2 class="mb-4 text-lg font-semibold">Historique des matchs</h2>
+            <div class="mb-4 flex items-center justify-between">
+                <h2 class="text-lg font-semibold">Historique des matchs</h2>
 
-            <div v-if="tournaments.length > 0" class="mb-4 flex flex-wrap gap-2">
-                <button
-                    v-for="tournament in tournaments"
-                    :key="tournament.id"
-                    @click="selectedTournamentId = tournament.id"
-                    class="rounded-lg border px-3 py-1.5 text-sm transition-colors"
-                    :class="
-                        selectedTournamentId === tournament.id
-                            ? 'border-[#1b1b18] bg-[#1b1b18] text-white dark:border-[#EDEDEC] dark:bg-[#EDEDEC] dark:text-[#1b1b18]'
-                            : 'border-[#e3e3e0] bg-white hover:border-[#1b1b18] dark:border-[#3E3E3A] dark:bg-[#161615] dark:hover:border-[#EDEDEC]'
-                    "
-                >
-                    {{ tournament.name }}
-                </button>
-                <button
-                    v-if="selectedTournamentId !== null"
-                    @click="selectedTournamentId = null"
-                    class="rounded-lg border border-[#e3e3e0] bg-white px-3 py-1.5 text-sm text-[#706f6c] transition-colors hover:border-[#1b1b18] hover:text-[#1b1b18] dark:border-[#3E3E3A] dark:bg-[#161615] dark:text-[#A1A09A] dark:hover:border-[#EDEDEC] dark:hover:text-[#EDEDEC]"
-                >
-                    Tous les matchs
-                </button>
+                <div v-if="tournaments.length > 0" class="w-64">
+                    <Combobox
+                        v-model="selectedTournament"
+                        v-model:search-term="tournamentSearchTerm"
+                        :filter-function="() => true"
+                    >
+                        <ComboboxAnchor>
+                            <ComboboxInput
+                                placeholder="Tous les tournois"
+                                :display-value="(val: Tournament) => val?.name"
+                            />
+                            <ComboboxTrigger />
+                        </ComboboxAnchor>
+                        <ComboboxContent>
+                            <ComboboxEmpty>Aucun tournoi trouvé.</ComboboxEmpty>
+                            <ComboboxItem :value="undefined">
+                                Tous les tournois
+                            </ComboboxItem>
+                            <ComboboxItem v-for="tournament in filteredTournaments" :key="tournament.id" :value="tournament">
+                                {{ tournament.name }}
+                            </ComboboxItem>
+                        </ComboboxContent>
+                    </Combobox>
+                </div>
             </div>
 
             <div class="overflow-x-auto rounded-lg border border-[#e3e3e0] bg-white shadow-sm dark:border-[#3E3E3A] dark:bg-[#161615]">
@@ -405,7 +424,7 @@ const filteredGames = computed(() => {
                     <thead>
                         <tr class="border-b border-[#e3e3e0] bg-[#f8f8f7] dark:border-[#3E3E3A] dark:bg-[#1a1a19]">
                             <th class="px-6 py-3 text-left text-sm font-semibold">Équipes</th>
-                            <th v-if="selectedTournamentId === null" class="px-6 py-3 text-left text-sm font-semibold">Tournoi</th>
+                            <th v-if="selectedTournament === undefined" class="px-6 py-3 text-left text-sm font-semibold">Tournoi</th>
                             <th class="px-6 py-3 text-center text-sm font-semibold">Résultat</th>
                             <th class="px-6 py-3 text-center text-sm font-semibold">Aller</th>
                             <th class="px-6 py-3 text-center text-sm font-semibold">Retour</th>
@@ -413,7 +432,7 @@ const filteredGames = computed(() => {
                     </thead>
                     <tbody>
                         <tr v-if="filteredGames.length === 0">
-                            <td :colspan="selectedTournamentId === null ? 5 : 4" class="px-6 py-8 text-center text-[#706f6c] dark:text-[#A1A09A]">
+                            <td :colspan="selectedTournament === undefined ? 5 : 4" class="px-6 py-8 text-center text-[#706f6c] dark:text-[#A1A09A]">
                                 Aucun match joué.
                             </td>
                         </tr>
@@ -445,7 +464,7 @@ const filteredGames = computed(() => {
                                     {{ game.team2.name }}
                                 </Link>
                             </td>
-                            <td v-if="selectedTournamentId === null" class="px-6 py-4 text-sm text-[#706f6c] dark:text-[#A1A09A]">
+                            <td v-if="selectedTournament === undefined" class="px-6 py-4 text-sm text-[#706f6c] dark:text-[#A1A09A]">
                                 <Link
                                     v-if="game.tournament"
                                     :href="showTournament(game.tournament.id).url"
