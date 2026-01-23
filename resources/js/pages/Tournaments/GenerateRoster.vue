@@ -360,8 +360,8 @@ function regenerate() {
                     </Button>
                 </div>
 
-                <div class="overflow-hidden rounded-lg border border-[#e3e3e0] bg-white shadow-sm dark:border-[#3E3E3A] dark:bg-[#161615]">
-                    <table class="w-full">
+                <div class="overflow-x-auto rounded-lg border border-[#e3e3e0] bg-white shadow-sm dark:border-[#3E3E3A] dark:bg-[#161615]">
+                    <table class="w-full min-w-[500px]">
                         <thead>
                             <tr class="border-b border-[#e3e3e0] bg-[#f8f8f7] dark:border-[#3E3E3A] dark:bg-[#1a1a19]">
                                 <th class="px-6 py-3 text-left text-sm font-semibold">#</th>
