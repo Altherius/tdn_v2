@@ -76,7 +76,6 @@ const chartData = computed(() => {
 const chartOptions = computed(() => {
     const isDark = resolvedAppearance.value === 'dark';
     const textColor = isDark ? '#A1A09A' : '#706f6c';
-    const gridColor = isDark ? '#3E3E3A' : '#e3e3e0';
 
     return {
         responsive: true,
@@ -101,7 +100,7 @@ const chartOptions = computed(() => {
                     color: textColor,
                 },
                 grid: {
-                    color: gridColor,
+                    display: false,
                 },
             },
             y: {
@@ -109,7 +108,7 @@ const chartOptions = computed(() => {
                     color: textColor,
                 },
                 grid: {
-                    color: gridColor,
+                    display: false,
                 },
             },
         },
