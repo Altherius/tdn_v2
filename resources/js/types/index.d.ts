@@ -6,8 +6,8 @@ export interface Auth {
 }
 
 export interface BreadcrumbItem {
-    title: string;
-    href: string;
+    label: string;
+    href?: string;
 }
 
 export interface NavItem {
@@ -36,4 +36,9 @@ export interface User {
     updated_at: string;
 }
 
-export type BreadcrumbItemType = BreadcrumbItem;
+export interface BreadcrumbItemType {
+    title: string;
+    href?: string;
+}
+
+export * from './models';

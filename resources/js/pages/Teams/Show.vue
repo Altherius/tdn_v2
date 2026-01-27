@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { edit as editTeam, show as showTeam } from '@/actions/App/Http/Controllers/TeamController';
-import { show as showTournament } from '@/actions/App/Http/Controllers/TournamentController';
+import { edit as editTeam } from '@/actions/App/Http/Controllers/TeamController';
 import {
     Combobox,
     ComboboxAnchor,
@@ -10,7 +9,12 @@ import {
     ComboboxItem,
     ComboboxTrigger,
 } from '@/components/ui/combobox';
+import ContentCard from '@/components/ContentCard.vue';
+import GamesHistoryTable from '@/components/GamesHistoryTable.vue';
+import Breadcrumb from '@/components/Breadcrumb.vue';
+import PublicLayout from '@/layouts/PublicLayout.vue';
 import { useAppearance } from '@/composables/useAppearance';
+import { usePieChartOptions } from '@/composables/useChartConfig';
 import { home } from '@/routes';
 import { Head, Link } from '@inertiajs/vue3';
 import {
@@ -24,11 +28,11 @@ import {
     Title,
     Tooltip,
 } from 'chart.js';
-import { Moon, Sun } from 'lucide-vue-next';
 import { computed, ref } from 'vue';
 import { Line, Pie } from 'vue-chartjs';
-import Navbar from '@/components/Navbar.vue';
-import Breadcrumb from '@/components/Breadcrumb.vue';
+import type { BreadcrumbItem } from '@/types';
+import type { EloHistory, Game, Team, Tournament } from '@/types/models';
+
 const breadcrumbs: BreadcrumbItem[] = [
     { label: 'Classement', href: home().url },
     { label: 'Détail' },
@@ -36,108 +40,14 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 ChartJS.register(ArcElement, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
-interface Region {
-    id: number;
-    name: string;
-}
-
-interface Team {
-    id: number;
-    name: string;
-    elo_rating: number;
-    region: Region;
-}
-
-interface Tournament {
-    id: number;
-    name: string;
-}
-
-interface Game {
-    id: number;
-    team1_id: number;
-    team2_id: number;
-    team1: Team;
-    team2: Team;
-    leg1_team1_score: number | null;
-    leg1_team2_score: number | null;
-    leg2_team1_score: number | null;
-    leg2_team2_score: number | null;
-    tournament: Tournament | null;
-}
-
-interface EloHistory {
-    id: number;
-    team_id: number;
-    game_id: number;
-    rating: number;
-    created_at: string;
-}
-
 const props = defineProps<{
     team: Team;
     games: Game[];
     eloHistory: EloHistory[];
 }>();
 
-const { resolvedAppearance, updateAppearance } = useAppearance();
-
-function toggleTheme() {
-    updateAppearance(resolvedAppearance.value === 'dark' ? 'light' : 'dark');
-}
-
-function formatLegResult(game: Game, leg: 1 | 2): string {
-    const team1Score = leg === 1 ? game.leg1_team1_score : game.leg2_team1_score;
-    const team2Score = leg === 1 ? game.leg1_team2_score : game.leg2_team2_score;
-
-    if (team1Score === null || team2Score === null) {
-        return '-';
-    }
-
-    return `${team1Score} - ${team2Score}`;
-}
-
-function formatTieResult(game: Game): string {
-    if (
-        game.leg1_team1_score === null ||
-        game.leg1_team2_score === null ||
-        game.leg2_team1_score === null ||
-        game.leg2_team2_score === null
-    ) {
-        return '-';
-    }
-
-    const team1Total = game.leg1_team1_score + game.leg2_team1_score;
-    const team2Total = game.leg1_team2_score + game.leg2_team2_score;
-
-    return `${team1Total} - ${team2Total}`;
-}
-
-function getTieResultClass(game: Game): string {
-    if (
-        game.leg1_team1_score === null ||
-        game.leg1_team2_score === null ||
-        game.leg2_team1_score === null ||
-        game.leg2_team2_score === null
-    ) {
-        return '';
-    }
-
-    const team1Total = game.leg1_team1_score + game.leg2_team1_score;
-    const team2Total = game.leg1_team2_score + game.leg2_team2_score;
-
-    const isTeam1 = props.team.id === game.team1_id;
-    const teamTotal = isTeam1 ? team1Total : team2Total;
-    const opponentTotal = isTeam1 ? team2Total : team1Total;
-
-    if (teamTotal > opponentTotal) {
-        return 'text-green-600 dark:text-green-400';
-    } else if (teamTotal < opponentTotal) {
-        return 'text-red-600 dark:text-red-400';
-    }
-
-    return 'text-yellow-600 dark:text-yellow-400';
-}
+const { resolvedAppearance } = useAppearance();
+const { pieChartOptions } = usePieChartOptions();
 
 const chartData = computed(() => {
     const labels = ['Initial', ...props.eloHistory.map((_, index) => `Match ${index + 1}`)];
@@ -297,25 +207,6 @@ const goalsChartData = computed(() => {
     };
 });
 
-const pieChartOptions = computed(() => {
-    const isDark = resolvedAppearance.value === 'dark';
-    const textColor = isDark ? '#A1A09A' : '#706f6c';
-
-    return {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-            legend: {
-                position: 'bottom' as const,
-                labels: {
-                    color: textColor,
-                    padding: 16,
-                },
-            },
-        },
-    };
-});
-
 const selectedTournament = ref<Tournament | undefined>(undefined);
 const tournamentSearchTerm = ref('');
 
@@ -344,149 +235,77 @@ const filteredGames = computed(() => {
 
 <template>
     <Head :title="team.name" />
-    <div class="flex min-h-screen flex-col bg-[#FDFDFC] text-[#1b1b18] dark:bg-[#0a0a0a] dark:text-[#EDEDEC]">
-        <Navbar />
-
-        <main class="mx-auto w-full max-w-4xl p-6 lg:p-8">
-            <Breadcrumb :items="breadcrumbs" />
-            <div class="mb-6">
-                <h1 class="text-2xl font-bold">{{ team.name }}</h1>
-                <p class="text-[#706f6c] dark:text-[#A1A09A]">
-                    {{ team.region.name }} &middot; Classement : {{ team.elo_rating }}
-                </p>
-                <Link
-                    v-if="$page.props.auth.user"
-                    :href="editTeam(team.id).url"
-                    class="mt-2 inline-block text-sm text-[#706f6c] hover:text-[#1b1b18] dark:text-[#A1A09A] dark:hover:text-[#EDEDEC]"
-                >
-                    Éditer l'équipe
-                </Link>
-            </div>
-
-            <div
-                class="mb-8 overflow-hidden rounded-lg border border-[#e3e3e0] bg-white p-6 shadow-sm dark:border-[#3E3E3A] dark:bg-[#161615]"
+    <PublicLayout>
+        <Breadcrumb :items="breadcrumbs" />
+        <div class="mb-6">
+            <h1 class="text-2xl font-bold">{{ team.name }}</h1>
+            <p class="text-[#706f6c] dark:text-[#A1A09A]">
+                {{ team.region.name }} &middot; Classement : {{ team.elo_rating }}
+            </p>
+            <Link
+                v-if="$page.props.auth.user"
+                :href="editTeam(team.id).url"
+                class="mt-2 inline-block text-sm text-[#706f6c] hover:text-[#1b1b18] dark:text-[#A1A09A] dark:hover:text-[#EDEDEC]"
             >
-                <div class="h-64">
-                    <Line :data="chartData" :options="chartOptions" />
-                </div>
-            </div>
+                Éditer l'équipe
+            </Link>
+        </div>
 
-            <div class="mb-8 grid gap-6 md:grid-cols-2">
-                <div
-                    class="overflow-hidden rounded-lg border border-[#e3e3e0] bg-white p-6 shadow-sm dark:border-[#3E3E3A] dark:bg-[#161615]"
+        <ContentCard class="mb-8">
+            <div class="h-64">
+                <Line :data="chartData" :options="chartOptions" />
+            </div>
+        </ContentCard>
+
+        <div class="mb-8 grid gap-6 md:grid-cols-2">
+            <ContentCard>
+                <h3 class="mb-4 text-center text-sm font-semibold">Résultats</h3>
+                <div class="h-48">
+                    <Pie :data="resultsChartData" :options="pieChartOptions" />
+                </div>
+            </ContentCard>
+            <ContentCard>
+                <h3 class="mb-4 text-center text-sm font-semibold">Buts</h3>
+                <div class="h-48">
+                    <Pie :data="goalsChartData" :options="pieChartOptions" />
+                </div>
+            </ContentCard>
+        </div>
+
+        <div class="mb-4 flex items-center justify-between">
+            <h2 class="text-lg font-semibold">Historique des matchs</h2>
+
+            <div v-if="tournaments.length > 0" class="w-64">
+                <Combobox
+                    v-model="selectedTournament"
+                    v-model:search-term="tournamentSearchTerm"
+                    :filter-function="() => true"
                 >
-                    <h3 class="mb-4 text-center text-sm font-semibold">Résultats</h3>
-                    <div class="h-48">
-                        <Pie :data="resultsChartData" :options="pieChartOptions" />
-                    </div>
-                </div>
-                <div
-                    class="overflow-hidden rounded-lg border border-[#e3e3e0] bg-white p-6 shadow-sm dark:border-[#3E3E3A] dark:bg-[#161615]"
-                >
-                    <h3 class="mb-4 text-center text-sm font-semibold">Buts</h3>
-                    <div class="h-48">
-                        <Pie :data="goalsChartData" :options="pieChartOptions" />
-                    </div>
-                </div>
+                    <ComboboxAnchor>
+                        <ComboboxInput
+                            placeholder="Tous les tournois"
+                            :display-value="(val: Tournament) => val?.name"
+                        />
+                        <ComboboxTrigger />
+                    </ComboboxAnchor>
+                    <ComboboxContent>
+                        <ComboboxEmpty>Aucun tournoi trouvé.</ComboboxEmpty>
+                        <ComboboxItem :value="undefined">
+                            Tous les tournois
+                        </ComboboxItem>
+                        <ComboboxItem v-for="tournament in filteredTournaments" :key="tournament.id" :value="tournament">
+                            {{ tournament.name }}
+                        </ComboboxItem>
+                    </ComboboxContent>
+                </Combobox>
             </div>
+        </div>
 
-            <div class="mb-4 flex items-center justify-between">
-                <h2 class="text-lg font-semibold">Historique des matchs</h2>
-
-                <div v-if="tournaments.length > 0" class="w-64">
-                    <Combobox
-                        v-model="selectedTournament"
-                        v-model:search-term="tournamentSearchTerm"
-                        :filter-function="() => true"
-                    >
-                        <ComboboxAnchor>
-                            <ComboboxInput
-                                placeholder="Tous les tournois"
-                                :display-value="(val: Tournament) => val?.name"
-                            />
-                            <ComboboxTrigger />
-                        </ComboboxAnchor>
-                        <ComboboxContent>
-                            <ComboboxEmpty>Aucun tournoi trouvé.</ComboboxEmpty>
-                            <ComboboxItem :value="undefined">
-                                Tous les tournois
-                            </ComboboxItem>
-                            <ComboboxItem v-for="tournament in filteredTournaments" :key="tournament.id" :value="tournament">
-                                {{ tournament.name }}
-                            </ComboboxItem>
-                        </ComboboxContent>
-                    </Combobox>
-                </div>
-            </div>
-
-            <div class="overflow-x-auto rounded-lg border border-[#e3e3e0] bg-white shadow-sm dark:border-[#3E3E3A] dark:bg-[#161615]">
-                <table class="w-full min-w-[500px]">
-                    <thead>
-                        <tr class="border-b border-[#e3e3e0] bg-[#f8f8f7] dark:border-[#3E3E3A] dark:bg-[#1a1a19]">
-                            <th class="px-6 py-3 text-left text-sm font-semibold">Équipes</th>
-                            <th v-if="selectedTournament === undefined" class="px-6 py-3 text-left text-sm font-semibold">Tournoi</th>
-                            <th class="px-6 py-3 text-center text-sm font-semibold">Résultat</th>
-                            <th class="px-6 py-3 text-center text-sm font-semibold">Aller</th>
-                            <th class="px-6 py-3 text-center text-sm font-semibold">Retour</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr v-if="filteredGames.length === 0">
-                            <td :colspan="selectedTournament === undefined ? 5 : 4" class="px-6 py-8 text-center text-[#706f6c] dark:text-[#A1A09A]">
-                                Aucun match joué.
-                            </td>
-                        </tr>
-                        <tr
-                            v-for="game in filteredGames"
-                            :key="game.id"
-                            class="border-b border-[#e3e3e0] last:border-b-0 dark:border-[#3E3E3A]"
-                        >
-                            <td class="px-6 py-4 text-sm">
-                                <span v-if="team.id === game.team1_id" class="font-semibold">
-                                    {{ game.team1.name }}
-                                </span>
-                                <Link
-                                    v-else
-                                    :href="showTeam(game.team1.id).url"
-                                    class="hover:underline"
-                                >
-                                    {{ game.team1.name }}
-                                </Link>
-                                <span class="mx-2 text-[#706f6c] dark:text-[#A1A09A]">vs</span>
-                                <span v-if="team.id === game.team2_id" class="font-semibold">
-                                    {{ game.team2.name }}
-                                </span>
-                                <Link
-                                    v-else
-                                    :href="showTeam(game.team2.id).url"
-                                    class="hover:underline"
-                                >
-                                    {{ game.team2.name }}
-                                </Link>
-                            </td>
-                            <td v-if="selectedTournament === undefined" class="px-6 py-4 text-sm text-[#706f6c] dark:text-[#A1A09A]">
-                                <Link
-                                    v-if="game.tournament"
-                                    :href="showTournament(game.tournament.id).url"
-                                    class="hover:underline"
-                                >
-                                    {{ game.tournament.name }}
-                                </Link>
-                                <span class="dark:text-[#444444] text-[#AAA]" v-else><i>Amical</i></span>
-                            </td>
-                            <td class="px-6 py-4 text-center text-sm font-mono font-semibold" :class="getTieResultClass(game)">
-                                {{ formatTieResult(game) }}
-                            </td>
-                            <td class="px-6 py-4 text-center text-sm font-mono dark:text-[#444444] text-[#AAA]">
-                                {{ formatLegResult(game, 1) }}
-                            </td>
-                            <td class="px-6 py-4 text-center text-sm font-mono dark:text-[#444444] text-[#AAA]">
-                                {{ formatLegResult(game, 2) }}
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </main>
-    </div>
+        <GamesHistoryTable
+            :games="filteredGames"
+            :highlight-team-id="team.id"
+            :show-tournament-column="selectedTournament === undefined"
+            empty-message="Aucun match joué."
+        />
+    </PublicLayout>
 </template>
