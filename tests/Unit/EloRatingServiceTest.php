@@ -50,3 +50,19 @@ test('higher rating difference leads to more extreme point exchanges', function 
 
     expect($largeDiffWin)->toBeGreaterThan($smallDiffWin);
 });
+
+test('bookmaker odds are balanced to 1:4 and 1:2 for 25/50/25', function () {
+    $odds = [
+        'home' => 0.25,
+        'draw' => 0.5,
+        'away' => 0.25,
+    ];
+
+    $bookmakerOdds = $this->service->calculateBookmakerOdds($odds);
+
+    expect($bookmakerOdds)->toEqual([
+        'home' => '1 : 4',
+        'draw' => '1 : 2',
+        'away' => '1 : 4'
+    ]);
+});

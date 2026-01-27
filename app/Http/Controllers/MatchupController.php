@@ -40,6 +40,8 @@ class MatchupController extends Controller
             $team2->elo_rating
         );
 
+        $bookmakerOdds = $this->eloRatingService->calculateBookmakerOdds($odds);
+
         return Inertia::render('Matchup/Show', [
             'team1' => $team1,
             'team2' => $team2,
@@ -48,6 +50,9 @@ class MatchupController extends Controller
                 'team1WinProbability' => round($odds['home'] * 100, 1),
                 'drawProbability' => round($odds['draw'] * 100, 1),
                 'team2WinProbability' => round($odds['away'] * 100, 1),
+                'team1Odds' => $bookmakerOdds['home'],
+                'drawOdds' => $bookmakerOdds['draw'],
+                'team2Odds' => $bookmakerOdds['away'],
                 'team1GainOnWin' => $this->eloRatingService->calculateExpectedGainOnWin(
                     $team1->elo_rating,
                     $team2->elo_rating

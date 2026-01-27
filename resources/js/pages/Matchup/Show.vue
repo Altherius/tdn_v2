@@ -25,7 +25,7 @@ const props = defineProps<{
 }>();
 
 const { resolvedAppearance } = useAppearance();
-const { pieChartOptions } = useChartConfig();
+const { pieChartOptions } = usePieChartOptions();
 
 const breadcrumbs: BreadcrumbItem[] = [
     { label: 'Classement', href: home().url },
@@ -53,8 +53,12 @@ const gameStats = computed(() => {
 
         // Determine if our team1 was game's team1 or team2
         const isOurTeam1AsGameTeam1 = game.team1_id === props.team1.id;
-        const ourTeam1Total = isOurTeam1AsGameTeam1 ? gameTeam1Total : gameTeam2Total;
-        const ourTeam2Total = isOurTeam1AsGameTeam1 ? gameTeam2Total : gameTeam1Total;
+        const ourTeam1Total = isOurTeam1AsGameTeam1
+            ? gameTeam1Total
+            : gameTeam2Total;
+        const ourTeam2Total = isOurTeam1AsGameTeam1
+            ? gameTeam2Total
+            : gameTeam1Total;
 
         if (ourTeam1Total > ourTeam2Total) {
             team1Wins++;
@@ -102,12 +106,21 @@ const goalStats = computed(() => {
 
 const resultsChartData = computed(() => {
     return {
-        labels: [`Victoires ${props.team1.name}`, 'Nuls', `Victoires ${props.team2.name}`],
+        labels: [
+            `Victoires ${props.team1.name}`,
+            'Nuls',
+            `Victoires ${props.team2.name}`,
+        ],
         datasets: [
             {
-                data: [gameStats.value.team1Wins, gameStats.value.draws, gameStats.value.team2Wins],
+                data: [
+                    gameStats.value.team1Wins,
+                    gameStats.value.draws,
+                    gameStats.value.team2Wins,
+                ],
                 backgroundColor: ['#22c55e', '#eab308', '#ef4444'],
-                borderColor: resolvedAppearance.value === 'dark' ? '#161615' : '#ffffff',
+                borderColor:
+                    resolvedAppearance.value === 'dark' ? '#161615' : '#ffffff',
                 borderWidth: 2,
             },
         ],
@@ -121,7 +134,8 @@ const goalsChartData = computed(() => {
             {
                 data: [goalStats.value.team1Goals, goalStats.value.team2Goals],
                 backgroundColor: ['#3b82f6', '#f97316'],
-                borderColor: resolvedAppearance.value === 'dark' ? '#161615' : '#ffffff',
+                borderColor:
+                    resolvedAppearance.value === 'dark' ? '#161615' : '#ffffff',
                 borderWidth: 2,
             },
         ],
@@ -134,7 +148,7 @@ const hasCompletedGames = computed(() => {
             g.leg1_team1_score !== null &&
             g.leg1_team2_score !== null &&
             g.leg2_team1_score !== null &&
-            g.leg2_team2_score !== null
+            g.leg2_team2_score !== null,
     );
 });
 </script>
@@ -145,9 +159,13 @@ const hasCompletedGames = computed(() => {
         <Breadcrumb :items="breadcrumbs" />
         <div class="mb-6">
             <h1 class="text-2xl font-bold">
-                <Link :href="showTeam(team1.id).url" class="hover:underline">{{ team1.name }}</Link>
+                <Link :href="showTeam(team1.id).url" class="hover:underline">{{
+                    team1.name
+                }}</Link>
                 <span class="mx-2 text-[#706f6c] dark:text-[#A1A09A]">vs</span>
-                <Link :href="showTeam(team2.id).url" class="hover:underline">{{ team2.name }}</Link>
+                <Link :href="showTeam(team2.id).url" class="hover:underline">{{
+                    team2.name
+                }}</Link>
             </h1>
             <p class="text-[#706f6c] dark:text-[#A1A09A]">
                 {{ team1.elo_rating }} ELO vs {{ team2.elo_rating }} ELO
@@ -157,18 +175,37 @@ const hasCompletedGames = computed(() => {
         <!-- Probabilities Card -->
         <ContentCard class="mb-4">
             <h3 class="mb-4 text-center font-semibold">Probabilités</h3>
-            <div class="flex items-center justify-center gap-8 text-center">
+            <div class="grid grid-cols-3 text-center">
                 <div>
-                    <div class="text-2xl font-bold">{{ analysis.team1WinProbability }}%</div>
-                    <div class="text-sm text-[#706f6c] dark:text-[#A1A09A]">{{ team1.name }}</div>
+                    <div class="text-xl font-bold">
+                        {{ analysis.team1WinProbability }}%
+                    </div>
+                    <div class="text-lg">
+                        {{ analysis.team1Odds }}
+                    </div>
+                    <div class="text-sm text-[#706f6c] dark:text-[#A1A09A]">
+                        {{ team1.name }}
+                    </div>
                 </div>
                 <div>
-                    <div class="text-2xl font-bold">{{ analysis.drawProbability }}%</div>
-                    <div class="text-sm text-[#706f6c] dark:text-[#A1A09A]">Nul</div>
+                    <div class="text-xl font-bold">
+                        {{ analysis.drawProbability }}%
+                    </div>
+                    <div class="text-lg">{{ analysis.drawOdds }}</div>
+                    <div class="text-sm text-[#706f6c] dark:text-[#A1A09A]">
+                        Nul
+                    </div>
                 </div>
                 <div>
-                    <div class="text-2xl font-bold">{{ analysis.team2WinProbability }}%</div>
-                    <div class="text-sm text-[#706f6c] dark:text-[#A1A09A]">{{ team2.name }}</div>
+                    <div class="text-xl font-bold">
+                        {{ analysis.team2WinProbability }}%
+                    </div>
+                    <div class="text-lg">
+                        {{ analysis.team2Odds }}
+                    </div>
+                    <div class="text-sm text-[#706f6c] dark:text-[#A1A09A]">
+                        {{ team2.name }}
+                    </div>
                 </div>
             </div>
         </ContentCard>
@@ -179,12 +216,22 @@ const hasCompletedGames = computed(() => {
                 <h3 class="mb-4 text-center font-semibold">{{ team1.name }}</h3>
                 <div class="space-y-3 text-sm">
                     <div class="flex justify-between">
-                        <span class="text-[#706f6c] dark:text-[#A1A09A]">ELO en cas de victoire</span>
-                        <span class="font-mono font-semibold text-green-600 dark:text-green-400">+{{ analysis.team1GainOnWin }}</span>
+                        <span class="text-[#706f6c] dark:text-[#A1A09A]"
+                            >ELO en cas de victoire</span
+                        >
+                        <span
+                            class="font-mono font-semibold text-green-600 dark:text-green-400"
+                            >+{{ analysis.team1GainOnWin }}</span
+                        >
                     </div>
                     <div class="flex justify-between">
-                        <span class="text-[#706f6c] dark:text-[#A1A09A]">ELO en cas de défaite</span>
-                        <span class="font-mono font-semibold text-red-600 dark:text-red-400">{{ analysis.team1LossOnLoss }}</span>
+                        <span class="text-[#706f6c] dark:text-[#A1A09A]"
+                            >ELO en cas de défaite</span
+                        >
+                        <span
+                            class="font-mono font-semibold text-red-600 dark:text-red-400"
+                            >{{ analysis.team1LossOnLoss }}</span
+                        >
                     </div>
                 </div>
             </ContentCard>
@@ -193,12 +240,22 @@ const hasCompletedGames = computed(() => {
                 <h3 class="mb-4 text-center font-semibold">{{ team2.name }}</h3>
                 <div class="space-y-3 text-sm">
                     <div class="flex justify-between">
-                        <span class="text-[#706f6c] dark:text-[#A1A09A]">ELO en cas de victoire</span>
-                        <span class="font-mono font-semibold text-green-600 dark:text-green-400">+{{ analysis.team2GainOnWin }}</span>
+                        <span class="text-[#706f6c] dark:text-[#A1A09A]"
+                            >ELO en cas de victoire</span
+                        >
+                        <span
+                            class="font-mono font-semibold text-green-600 dark:text-green-400"
+                            >+{{ analysis.team2GainOnWin }}</span
+                        >
                     </div>
                     <div class="flex justify-between">
-                        <span class="text-[#706f6c] dark:text-[#A1A09A]">ELO en cas de défaite</span>
-                        <span class="font-mono font-semibold text-red-600 dark:text-red-400">{{ analysis.team2LossOnLoss }}</span>
+                        <span class="text-[#706f6c] dark:text-[#A1A09A]"
+                            >ELO en cas de défaite</span
+                        >
+                        <span
+                            class="font-mono font-semibold text-red-600 dark:text-red-400"
+                            >{{ analysis.team2LossOnLoss }}</span
+                        >
                     </div>
                 </div>
             </ContentCard>
@@ -207,13 +264,17 @@ const hasCompletedGames = computed(() => {
         <!-- Charts (only if there are completed games) -->
         <div v-if="hasCompletedGames" class="mb-8 grid gap-6 md:grid-cols-2">
             <ContentCard>
-                <h3 class="mb-4 text-center text-sm font-semibold">Résultats des confrontations</h3>
+                <h3 class="mb-4 text-center text-sm font-semibold">
+                    Résultats des confrontations
+                </h3>
                 <div class="h-48">
                     <Pie :data="resultsChartData" :options="pieChartOptions" />
                 </div>
             </ContentCard>
             <ContentCard>
-                <h3 class="mb-4 text-center text-sm font-semibold">Buts marqués</h3>
+                <h3 class="mb-4 text-center text-sm font-semibold">
+                    Buts marqués
+                </h3>
                 <div class="h-48">
                     <Pie :data="goalsChartData" :options="pieChartOptions" />
                 </div>
@@ -221,7 +282,9 @@ const hasCompletedGames = computed(() => {
         </div>
 
         <!-- Games History -->
-        <h2 class="mb-4 text-lg font-semibold">Historique des confrontations</h2>
+        <h2 class="mb-4 text-lg font-semibold">
+            Historique des confrontations
+        </h2>
 
         <GamesHistoryTable
             :games="games"

@@ -56,8 +56,11 @@ export interface EloHistory {
 
 export interface MatchupAnalysis {
     team1WinProbability: number;
+    team1Odds: string;
     drawProbability: number;
+    drawOdds: string;
     team2WinProbability: number;
+    team2Odds: string;
     team1GainOnWin: number;
     team1LossOnLoss: number;
     team2GainOnWin: number;
