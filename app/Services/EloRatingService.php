@@ -49,13 +49,13 @@ class EloRatingService
         return [
             'home' => $homeWinProbability,
             'draw' => $drawProbability,
-            'away' => $awayWinProbability
+            'away' => $awayWinProbability,
         ];
     }
 
     public function calculateBookmakerOdds(array $odds)
     {
-        return array_map(fn (float $odd) => '1 : ' . round((1 / $odd), 2), $odds);
+        return array_map(fn (float $odd) => '1 : '.round((1 / $odd), 2), $odds);
     }
 
     /**

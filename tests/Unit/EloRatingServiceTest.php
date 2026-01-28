@@ -63,6 +63,6 @@ test('bookmaker odds are balanced to 1:4 and 1:2 for 25/50/25', function () {
     expect($bookmakerOdds)->toEqual([
         'home' => '1 : 4',
         'draw' => '1 : 2',
-        'away' => '1 : 4'
+        'away' => '1 : 4',
     ]);
 });
