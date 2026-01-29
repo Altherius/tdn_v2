@@ -61,8 +61,8 @@ class TeamController extends Controller
     {
         return Inertia::render('Teams/Show', [
             'team' => $team->load(['region', 'country']),
-            'games' => $team->games()->with(['team1', 'team2', 'tournament'])->orderByDesc('created_at')->get(),
-            'eloHistory' => $team->eloHistory()->orderBy('created_at')->get(),
+            'games' => $team->games()->with(['team1.country', 'team2.country', 'tournament'])->orderByDesc('created_at')->get(),
+            'eloHistory' => $team->eloHistory()->with(['game.team1.country', 'game.team2.country'])->orderBy('created_at')->get(),
         ]);
     }
 

@@ -1,5 +1,8 @@
 <?php
 
+use App\Models\Country;
+use App\Models\EloHistory;
+use App\Models\Game;
 use App\Models\Region;
 use App\Models\Team;
 use App\Models\User;
@@ -122,4 +125,35 @@ it('redirects guests to login when accessing team edit', function () {
     $response = $this->get("/teams/edit/{$team->id}");
 
     $response->assertRedirect('/login');
+});
+
+it('can render team show page with elo history including opponent country', function () {
+    $country1 = Country::factory()->create(['code' => 'FR']);
+    $country2 = Country::factory()->create(['code' => 'DE']);
+
+    $team = Team::factory()->create(['country_id' => $country1->id]);
+    $opponent = Team::factory()->create(['country_id' => $country2->id]);
+
+    $game = Game::factory()->create([
+        'team1_id' => $team->id,
+        'team2_id' => $opponent->id,
+    ]);
+
+    EloHistory::factory()->create([
+        'team_id' => $team->id,
+        'game_id' => $game->id,
+        'rating' => 1020,
+    ]);
+
+    $response = $this->get("/teams/{$team->id}");
+
+    $response->assertSuccessful();
+    $response->assertInertia(fn (AssertableInertia $page) => $page
+        ->component('Teams/Show')
+        ->has('team')
+        ->has('eloHistory', 1)
+        ->has('eloHistory.0.game')
+        ->has('eloHistory.0.game.team2.country')
+        ->where('eloHistory.0.game.team2.country.code', 'DE')
+    );
 });
