@@ -28,7 +28,7 @@ import {
     Title,
     Tooltip,
 } from 'chart.js';
-import { computed, ref } from 'vue';
+import { computed, nextTick, onMounted, ref } from 'vue';
 import { Line, Pie } from 'vue-chartjs';
 import type { BreadcrumbItem } from '@/types';
 import type { EloHistory, Game, Team, Tournament } from '@/types/models';
@@ -49,7 +49,20 @@ const props = defineProps<{
 const { resolvedAppearance } = useAppearance();
 const { pieChartOptions } = usePieChartOptions();
 
+const gbSubdivisionFlags: Record<string, string> = {
+    'gb-eng': '\u{1F3F4}\u{E0067}\u{E0062}\u{E0065}\u{E006E}\u{E0067}\u{E007F}', // England
+    'gb-sct': '\u{1F3F4}\u{E0067}\u{E0062}\u{E0073}\u{E0063}\u{E0074}\u{E007F}', // Scotland
+    'gb-wls': '\u{1F3F4}\u{E0067}\u{E0062}\u{E0077}\u{E006C}\u{E0073}\u{E007F}', // Wales
+    'gb-nir': '\u{1F3F4}\u{E0067}\u{E0062}\u{E006E}\u{E0069}\u{E0072}\u{E007F}', // Northern Ireland (uses black flag as base)
+};
+
 function countryCodeToFlag(code: string): string {
+    const lowerCode = code.toLowerCase();
+
+    if (gbSubdivisionFlags[lowerCode]) {
+        return gbSubdivisionFlags[lowerCode];
+    }
+
     return code
         .toUpperCase()
         .split('')
@@ -76,6 +89,29 @@ function getOpponentLabel(eloEntry: EloHistory): string {
 
 const needsScrolling = computed(() => props.eloHistory.length > 30);
 const chartMinWidth = computed(() => (needsScrolling.value ? `${props.eloHistory.length * 40}px` : '100%'));
+
+const chartScrollContainer = ref<HTMLElement | null>(null);
+
+onMounted(() => {
+    if (needsScrolling.value && chartScrollContainer.value) {
+        nextTick(() => {
+            if (chartScrollContainer.value) {
+                chartScrollContainer.value.scrollLeft = chartScrollContainer.value.scrollWidth;
+            }
+        });
+    }
+});
+
+const eloRange = computed(() => {
+    const ratings = [1000, ...props.eloHistory.map((h) => h.rating)];
+    const min = Math.min(...ratings);
+    const max = Math.max(...ratings);
+    const padding = Math.max(20, Math.ceil((max - min) * 0.1));
+    return {
+        min: Math.floor((min - padding) / 10) * 10,
+        max: Math.ceil((max + padding) / 10) * 10,
+    };
+});
 
 const chartData = computed(() => {
     const labels = ['Initial', ...props.eloHistory.map((entry) => getOpponentLabel(entry))];
@@ -132,6 +168,64 @@ const chartOptions = computed(() => {
                 },
             },
             y: {
+                min: eloRange.value.min,
+                max: eloRange.value.max,
+                ticks: {
+                    color: textColor,
+                    display: !needsScrolling.value,
+                },
+                grid: {
+                    display: false,
+                },
+            },
+        },
+    };
+});
+
+const yAxisChartData = computed(() => {
+    const isDark = resolvedAppearance.value === 'dark';
+    const lineColor = isDark ? '#60a5fa' : '#2563eb';
+
+    return {
+        labels: [''],
+        datasets: [
+            {
+                label: 'Classement',
+                data: [eloRange.value.min],
+                borderColor: lineColor,
+                backgroundColor: 'transparent',
+            },
+        ],
+    };
+});
+
+const yAxisChartOptions = computed(() => {
+    const isDark = resolvedAppearance.value === 'dark';
+    const textColor = isDark ? '#A1A09A' : '#706f6c';
+
+    return {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                display: false,
+            },
+            title: {
+                display: true,
+                text: ' ',
+                font: {
+                    size: 16,
+                    weight: 'bold' as const,
+                },
+            },
+        },
+        scales: {
+            x: {
+                display: false,
+            },
+            y: {
+                min: eloRange.value.min,
+                max: eloRange.value.max,
                 ticks: {
                     color: textColor,
                 },
@@ -279,10 +373,18 @@ const filteredGames = computed(() => {
         </div>
 
         <ContentCard class="mb-8">
-            <div :class="needsScrolling ? 'overflow-x-auto' : ''">
-                <div class="h-64" :style="{ minWidth: chartMinWidth }">
-                    <Line :data="chartData" :options="chartOptions" />
+            <div v-if="needsScrolling" class="flex">
+                <div class="h-64 w-12 shrink-0">
+                    <Line :data="yAxisChartData" :options="yAxisChartOptions" />
                 </div>
+                <div ref="chartScrollContainer" class="h-64 flex-1 overflow-x-auto">
+                    <div class="h-full" :style="{ minWidth: chartMinWidth }">
+                        <Line :data="chartData" :options="chartOptions" />
+                    </div>
+                </div>
+            </div>
+            <div v-else class="h-64">
+                <Line :data="chartData" :options="chartOptions" />
             </div>
         </ContentCard>
 
