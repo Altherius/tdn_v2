@@ -129,9 +129,12 @@ const chartData = computed(() => {
                 data: ratings,
                 borderColor: lineColor,
                 backgroundColor: pointColor,
-                tension: 0.1,
-                pointRadius: 4,
-                pointHoverRadius: 6,
+                tension: 0.4,
+                pointRadius: 2,
+                pointHoverRadius: 4,
+                segment: {
+                    borderColor: ctx => ctx.p1.parsed.y > ctx.p0.parsed.y ? 'green' : 'red'
+                },
             },
         ],
     };
@@ -149,7 +152,7 @@ const chartOptions = computed(() => {
                 display: false,
             },
             title: {
-                display: true,
+                display: false,
                 text: 'Historique du classement',
                 color: textColor,
                 font: {
@@ -172,7 +175,8 @@ const chartOptions = computed(() => {
                     color: textColor,
                 },
                 grid: {
-                    display: false,
+                    display: true,
+                    color: isDark ? '#333' : '#ccc'
                 },
             },
         },
@@ -314,6 +318,7 @@ const filteredGames = computed(() => {
             </Link>
         </div>
 
+        <h2 class="text-lg font-semibold mb-4">Historique du classement</h2>
         <ContentCard class="mb-8">
             <div ref="chartScrollContainer" :class="needsScrolling ? 'overflow-x-auto' : ''">
                 <div class="h-64" :style="{ minWidth: chartMinWidth }">
