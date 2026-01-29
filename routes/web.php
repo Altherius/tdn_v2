@@ -4,9 +4,7 @@ use App\Http\Controllers\GameController;
 use App\Http\Controllers\MatchupController;
 use App\Http\Controllers\TeamController;
 use App\Http\Controllers\TournamentController;
-use App\Models\Team;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
 
 Route::get('/', [TeamController::class, 'index'])->name('home');
 Route::get('tournaments', [TournamentController::class, 'index'])->name('tournaments.index');

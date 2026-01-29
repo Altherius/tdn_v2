@@ -1,11 +1,7 @@
 <script setup lang="ts">
+import type { BreadcrumbItem } from '@/types';
 import { Link } from '@inertiajs/vue3';
 import { ChevronRight } from 'lucide-vue-next';
-
-export interface BreadcrumbItem {
-    label: string;
-    href?: string;
-}
 
 defineProps<{
     items: BreadcrumbItem[];
