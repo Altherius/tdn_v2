@@ -168,64 +168,6 @@ const chartOptions = computed(() => {
                 },
             },
             y: {
-                min: eloRange.value.min,
-                max: eloRange.value.max,
-                ticks: {
-                    color: textColor,
-                    display: !needsScrolling.value,
-                },
-                grid: {
-                    display: false,
-                },
-            },
-        },
-    };
-});
-
-const yAxisChartData = computed(() => {
-    const isDark = resolvedAppearance.value === 'dark';
-    const lineColor = isDark ? '#60a5fa' : '#2563eb';
-
-    return {
-        labels: [''],
-        datasets: [
-            {
-                label: 'Classement',
-                data: [eloRange.value.min],
-                borderColor: lineColor,
-                backgroundColor: 'transparent',
-            },
-        ],
-    };
-});
-
-const yAxisChartOptions = computed(() => {
-    const isDark = resolvedAppearance.value === 'dark';
-    const textColor = isDark ? '#A1A09A' : '#706f6c';
-
-    return {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-            legend: {
-                display: false,
-            },
-            title: {
-                display: true,
-                text: ' ',
-                font: {
-                    size: 16,
-                    weight: 'bold' as const,
-                },
-            },
-        },
-        scales: {
-            x: {
-                display: false,
-            },
-            y: {
-                min: eloRange.value.min,
-                max: eloRange.value.max,
                 ticks: {
                     color: textColor,
                 },
@@ -373,18 +315,10 @@ const filteredGames = computed(() => {
         </div>
 
         <ContentCard class="mb-8">
-            <div v-if="needsScrolling" class="flex">
-                <div class="h-64 w-12 shrink-0">
-                    <Line :data="yAxisChartData" :options="yAxisChartOptions" />
+            <div ref="chartScrollContainer" :class="needsScrolling ? 'overflow-x-auto' : ''">
+                <div class="h-64" :style="{ minWidth: chartMinWidth }">
+                    <Line :data="chartData" :options="chartOptions" />
                 </div>
-                <div ref="chartScrollContainer" class="h-64 flex-1 overflow-x-auto">
-                    <div class="h-full" :style="{ minWidth: chartMinWidth }">
-                        <Line :data="chartData" :options="chartOptions" />
-                    </div>
-                </div>
-            </div>
-            <div v-else class="h-64">
-                <Line :data="chartData" :options="chartOptions" />
             </div>
         </ContentCard>
 

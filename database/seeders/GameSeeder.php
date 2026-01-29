@@ -19,7 +19,7 @@ class GameSeeder extends Seeder
             return;
         }
 
-        for ($i = 0; $i < 50; $i++) {
+        for ($i = 0; $i < 1000; $i++) {
             $selectedTeams = $teams->random(2);
 
             Game::factory()->played()->create([
