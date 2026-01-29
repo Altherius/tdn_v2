@@ -40,52 +40,6 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 ChartJS.register(ArcElement, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
-interface Region {
-    id: number;
-    name: string;
-}
-
-interface Country {
-    id: number;
-    name: string;
-    code: string;
-}
-
-interface Team {
-    id: number;
-    name: string;
-    elo_rating: number;
-    region: Region;
-    country?: Country | null;
-}
-
-interface Tournament {
-    id: number;
-    name: string;
-}
-
-interface Game {
-    id: number;
-    team1_id: number;
-    team2_id: number;
-    team1: Team;
-    team2: Team;
-    leg1_team1_score: number | null;
-    leg1_team2_score: number | null;
-    leg2_team1_score: number | null;
-    leg2_team2_score: number | null;
-    tournament: Tournament | null;
-}
-
-interface EloHistory {
-    id: number;
-    team_id: number;
-    game_id: number;
-    rating: number;
-    created_at: string;
-    game?: Game;
-}
-
 const props = defineProps<{
     team: Team;
     games: Game[];
@@ -94,6 +48,34 @@ const props = defineProps<{
 
 const { resolvedAppearance } = useAppearance();
 const { pieChartOptions } = usePieChartOptions();
+
+function countryCodeToFlag(code: string): string {
+    return code
+        .toUpperCase()
+        .split('')
+        .map((char) => String.fromCodePoint(0x1f1e6 - 65 + char.charCodeAt(0)))
+        .join('');
+}
+
+function getOpponentLabel(eloEntry: EloHistory): string {
+    const game = eloEntry.game;
+
+    if (!game) {
+        return '?';
+    }
+
+    const isTeam1 = props.team.id === game.team1_id;
+    const opponent = isTeam1 ? game.team2 : game.team1;
+
+    if (opponent?.country?.code) {
+        return countryCodeToFlag(opponent.country.code);
+    }
+
+    return opponent?.name ?? '?';
+}
+
+const needsScrolling = computed(() => props.eloHistory.length > 30);
+const chartMinWidth = computed(() => (needsScrolling.value ? `${props.eloHistory.length * 40}px` : '100%'));
 
 const chartData = computed(() => {
     const labels = ['Initial', ...props.eloHistory.map((entry) => getOpponentLabel(entry))];
@@ -296,10 +278,9 @@ const filteredGames = computed(() => {
             </Link>
         </div>
 
-            <div
-                class="mb-8 overflow-hidden rounded-lg border border-[#e3e3e0] bg-white p-6 shadow-sm dark:border-[#3E3E3A] dark:bg-[#161615]"
-            >
-                <div class="h-64">
+        <ContentCard class="mb-8">
+            <div :class="needsScrolling ? 'overflow-x-auto' : ''">
+                <div class="h-64" :style="{ minWidth: chartMinWidth }">
                     <Line :data="chartData" :options="chartOptions" />
                 </div>
             </div>

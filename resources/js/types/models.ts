@@ -52,6 +52,7 @@ export interface EloHistory {
     game_id: number;
     rating: number;
     created_at: string;
+    game?: Game;
 }
 
 export interface MatchupAnalysis {
