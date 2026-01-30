@@ -321,7 +321,7 @@ const filteredGames = computed(() => {
         <h2 class="text-lg font-semibold mb-4">Historique du classement</h2>
         <ContentCard class="mb-8">
             <div ref="chartScrollContainer" :class="needsScrolling ? 'overflow-x-auto' : ''">
-                <div class="h-64" :style="{ minWidth: chartMinWidth }">
+                <div class="h-64 mb-1" :style="{ minWidth: chartMinWidth }">
                     <Line :data="chartData" :options="chartOptions" />
                 </div>
             </div>
