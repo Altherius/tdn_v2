@@ -28,7 +28,7 @@ import {
     Title,
     Tooltip,
 } from 'chart.js';
-import { computed, nextTick, onMounted, ref } from 'vue';
+import { computed, ref } from 'vue';
 import { Line, Pie } from 'vue-chartjs';
 import type { BreadcrumbItem } from '@/types';
 import type { EloHistory, Game, Team, Tournament } from '@/types/models';
@@ -87,20 +87,6 @@ function getOpponentLabel(eloEntry: EloHistory): string {
     return opponent?.name ?? '?';
 }
 
-const needsScrolling = computed(() => props.eloHistory.length > 30);
-const chartMinWidth = computed(() => (needsScrolling.value ? `${props.eloHistory.length * 40}px` : '100%'));
-
-const chartScrollContainer = ref<HTMLElement | null>(null);
-
-onMounted(() => {
-    if (needsScrolling.value && chartScrollContainer.value) {
-        nextTick(() => {
-            if (chartScrollContainer.value) {
-                chartScrollContainer.value.scrollLeft = chartScrollContainer.value.scrollWidth;
-            }
-        });
-    }
-});
 
 const eloRange = computed(() => {
     const ratings = [1000, ...props.eloHistory.map((h) => h.rating)];
@@ -164,6 +150,7 @@ const chartOptions = computed(() => {
         scales: {
             x: {
                 ticks: {
+                    display: props.eloHistory.length <= 30,
                     color: textColor,
                 },
                 grid: {
@@ -320,10 +307,8 @@ const filteredGames = computed(() => {
 
         <h2 class="text-lg font-semibold mb-4">Historique du classement</h2>
         <ContentCard class="mb-8">
-            <div ref="chartScrollContainer" :class="needsScrolling ? 'overflow-x-auto' : ''">
-                <div class="h-64 mb-1" :style="{ minWidth: chartMinWidth }">
-                    <Line :data="chartData" :options="chartOptions" />
-                </div>
+            <div class="h-64 mb-1">
+                <Line :data="chartData" :options="chartOptions" />
             </div>
         </ContentCard>
 
